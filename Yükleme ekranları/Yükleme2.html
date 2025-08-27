@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Oyun Yükleniyor...</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      text-align: center;
+    }
+    h2 {
+      margin: 10px 0;
+    }
+    .progress-container {
+      width: 80%;
+      max-width: 400px;
+      background: #2a2a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 20px;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+    .progress-bar {
+      height: 22px;
+      width: 0%;
+      background: linear-gradient(90deg, #00ff88, #00ffaa, #00ffcc);
+      transition: width 0.3s ease-in-out;
+    }
+    .size-text {
+      margin-top: 10px;
+      font-size: 1.1em;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Oyun Yükleniyor...</h2>
+  <div class="progress-container">
+    <div class="progress-bar" id="bar"></div>
+  </div>
+  <div class="size-text" id="size">0 MB / 40 MB</div>
+
+  <script>
+    let progress = 0;
+    const bar = document.getElementById('bar');
+    const sizeText = document.getElementById('size');
+    const totalMB = 40;
+
+    const interval = setInterval(() => {
+      // Daha gerçekçi hız için 1-4% arası artış
+      let step = Math.floor(Math.random() * 4) + 1;
+      progress += step;
+      if (progress > 100) progress = 100;
+
+      bar.style.width = progress + "%";
+
+      // MB hesaplama
+      let currentMB = Math.round((progress / 100) * totalMB);
+      sizeText.textContent = `${currentMB} MB / ${totalMB} MB`;
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          window.location.href = "../Oyunlar/file2.html";
+        }, 500); // küçük gecikme daha doğal durur
+      }
+    }, 200);
+  </script>
+</body>
+</html>
