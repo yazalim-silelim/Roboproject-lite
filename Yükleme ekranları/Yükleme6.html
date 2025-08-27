@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Futbol Şampiyonası - Yükleniyor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #228b22 0%, #32cd32 25%, #00ff00 50%, #90ee90 75%, #98fb98 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .loading-container {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .game-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ffffff, #f0f8ff, #e6f3ff);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .loading-bar {
+      width: 400px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 2rem auto;
+      position: relative;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .loading-progress {
+      height: 100%;
+      background: linear-gradient(45deg, #ffffff, #f0f8ff, #e6f3ff);
+      border-radius: 3px;
+      width: 0%;
+      animation: loading 3s ease-in-out infinite;
+      position: relative;
+    }
+
+    .loading-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loading {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .loading-text {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1rem;
+    }
+
+    .loading-percentage {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .sports-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+
+    .football {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(45deg, #000000, #333333);
+      border-radius: 50%;
+      top: 20%;
+      left: 15%;
+      animation: footballBounce 2s ease-in-out infinite;
+    }
+
+    .football::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(45deg, #ffffff, #f0f0f0);
+      border-radius: 50%;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+
+    @keyframes footballBounce {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .goal {
+      position: absolute;
+      width: 100px;
+      height: 60px;
+      border: 8px solid #ffffff;
+      border-bottom: none;
+      top: 30%;
+      right: 20%;
+      animation: goalGlow 3s ease-in-out infinite;
+    }
+
+    .goal::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 2px;
+      background: #ffffff;
+      animation: netMove 2s ease-in-out infinite;
+    }
+
+    .goal::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 40px;
+      background: #ffffff;
+      animation: netMove 2s ease-in-out infinite reverse;
+    }
+
+    @keyframes goalGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.8); }
+    }
+
+    @keyframes netMove {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .player {
+      position: absolute;
+      width: 30px;
+      height: 50px;
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+      border-radius: 15px 15px 0 0;
+      bottom: 25%;
+      left: 25%;
+      animation: playerRun 3s ease-in-out infinite;
+    }
+
+    .player::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: #ffd700;
+      border-radius: 50%;
+    }
+
+    .player::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 15px;
+      background: #000000;
+      border-radius: 3px;
+    }
+
+    @keyframes playerRun {
+      0%, 100% { transform: translateX(0px) translateY(0px); }
+      25% { transform: translateX(15px) translateY(-5px); }
+      50% { transform: translateX(30px) translateY(0px); }
+      75% { transform: translateX(15px) translateY(-5px); }
+    }
+
+    .start-button {
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #ffffff, #f0f8ff);
+      color: #228b22;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in-out 3s forwards;
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .start-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 255, 255, 0.5);
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .loading-tips {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+    }
+
+    .trophy {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      animation: trophyShine 3s ease-in-out infinite;
+    }
+
+    @keyframes trophyShine {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.1); }
+    }
+
+    .field-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+    }
+
+    .field-line {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .field-line.horizontal {
+      width: 100%;
+      height: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .field-line.vertical {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .field-line.circle {
+      width: 100px;
+      height: 100px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="field-lines">
+    <div class="field-line horizontal"></div>
+    <div class="field-line vertical"></div>
+    <div class="field-line circle"></div>
+  </div>
+
+  <div class="sports-elements">
+    <div class="trophy">🏆</div>
+    <div class="football"></div>
+    <div class="goal"></div>
+    <div class="player"></div>
+  </div>
+
+  <div class="loading-container">
+    <h1 class="game-title">⚽ Futbol Şampiyonası</h1>
+    <div class="loading-text">Stadyum hazırlanıyor...</div>
+    <div class="loading-percentage" id="percentage">0%</div>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+    <button class="start-button" onclick="startGame()">MAÇA BAŞLA</button>
+    
+    <div class="loading-tips">
+      <p>💡 İpucu: Takımınızı güçlendirin ve strateji geliştirin!</p>
+      <p>💡 İpucu: Pas yaparak gol fırsatları yaratın!</p>
+      <p>💡 İpucu: Savunmanızı güçlü tutun!</p>
+    </div>
+  </div>
+
+  <script>
+    let progress = 0;
+    const percentageElement = document.getElementById('percentage');
+    
+    const loadingInterval = setInterval(() => {
+      progress += Math.random() * 10;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(loadingInterval);
+      }
+      percentageElement.textContent = Math.floor(progress) + '%';
+    }, 200);
+
+    function startGame() {
+      // Oyun başlatma animasyonu
+      document.body.style.animation = 'fadeOut 0.5s ease-in-out forwards';
+      setTimeout(() => {
+        window.location.href = '../Oyunlar/futbol-sampiyonasi.html';
+      }, 500);
+    }
+
+    // Sayfa yüklendiğinde otomatik başlat
+    setTimeout(() => {
+      if (progress >= 100) {
+        document.querySelector('.start-button').style.animation = 'pulse 1s ease-in-out infinite';
+      }
+    }, 3000);
+  </script>
+</body>
+</html>

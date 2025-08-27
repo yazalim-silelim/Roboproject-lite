@@ -428,6 +428,136 @@
        font-weight: 500;
      }
 
+     /* About Section */
+     .about-section {
+       padding: 6rem 0;
+       background: rgba(255, 255, 255, 0.02);
+       backdrop-filter: blur(20px);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       margin: 2rem 0;
+       border-radius: 20px;
+     }
+
+     .about-content {
+       max-width: 1000px;
+       margin: 0 auto;
+     }
+
+     .about-title {
+       text-align: center;
+       font-size: 3rem;
+       font-weight: 700;
+       margin-bottom: 2rem;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .about-description {
+       text-align: center;
+       font-size: 1.2rem;
+       color: rgba(255, 255, 255, 0.9);
+       line-height: 1.8;
+       margin-bottom: 3rem;
+       max-width: 800px;
+       margin-left: auto;
+       margin-right: auto;
+     }
+
+     .features-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+       gap: 2rem;
+       margin-bottom: 3rem;
+     }
+
+     .feature-item {
+       text-align: center;
+       padding: 2rem;
+       background: rgba(255, 255, 255, 0.05);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       border-radius: 15px;
+       transition: all 0.3s ease;
+     }
+
+     .feature-item:hover {
+       transform: translateY(-5px);
+       border-color: rgba(0, 212, 255, 0.3);
+       box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+     }
+
+     .feature-icon {
+       font-size: 3rem;
+       margin-bottom: 1rem;
+     }
+
+     .feature-item h3 {
+       font-size: 1.3rem;
+       margin-bottom: 1rem;
+       color: #ffffff;
+     }
+
+     .feature-item p {
+       color: rgba(255, 255, 255, 0.8);
+       line-height: 1.6;
+     }
+
+     .team-section {
+       text-align: center;
+       margin-bottom: 3rem;
+       padding: 2rem;
+       background: rgba(255, 255, 255, 0.03);
+       border-radius: 15px;
+       border: 1px solid rgba(255, 255, 255, 0.1);
+     }
+
+     .team-section h3 {
+       font-size: 2rem;
+       margin-bottom: 1rem;
+       color: #ffffff;
+     }
+
+     .team-section p {
+       color: rgba(255, 255, 255, 0.8);
+       line-height: 1.8;
+       max-width: 700px;
+       margin: 0 auto;
+     }
+
+     .contact-info {
+       text-align: center;
+       padding: 2rem;
+       background: rgba(255, 255, 255, 0.03);
+       border-radius: 15px;
+       border: 1px solid rgba(255, 255, 255, 0.1);
+     }
+
+     .contact-info h3 {
+       font-size: 2rem;
+       margin-bottom: 1.5rem;
+       color: #ffffff;
+     }
+
+     .contact-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+       gap: 1rem;
+       max-width: 600px;
+       margin: 0 auto;
+     }
+
+     .contact-item {
+       padding: 1rem;
+       background: rgba(255, 255, 255, 0.05);
+       border-radius: 10px;
+       color: rgba(255, 255, 255, 0.9);
+     }
+
+     .contact-item strong {
+       color: #00d4ff;
+     }
+
      /* Footer */
      footer {
        text-align: center;
@@ -520,6 +650,22 @@
        .stats-grid {
          grid-template-columns: 1fr;
        }
+       
+       .features-grid {
+         grid-template-columns: 1fr;
+       }
+       
+       .contact-grid {
+         grid-template-columns: 1fr;
+       }
+       
+       .about-title {
+         font-size: 2rem;
+       }
+       
+       .about-description {
+         font-size: 1rem;
+       }
      }
    </style>
  </head>
@@ -590,6 +736,71 @@
      </div>
    </section>
 
+   <!-- About Section -->
+   <section class="about-section" id="about">
+     <div class="container">
+       <div class="about-content">
+         <div class="about-text">
+           <h2 class="about-title">🚀 Hakkımızda</h2>
+           <p class="about-description">
+             RoboProject Lite, modern teknolojilerle geliştirilmiş 3D oyun platformudur. 
+             Oyuncularımıza en yüksek kalitede oyun deneyimi sunmak için sürekli çalışıyoruz.
+           </p>
+           
+           <div class="features-grid">
+             <div class="feature-item">
+               <div class="feature-icon">🎮</div>
+               <h3>Çeşitli Oyunlar</h3>
+               <p>Yarış, macera, aksiyon, strateji ve spor kategorilerinde 50+ oyun</p>
+             </div>
+             
+             <div class="feature-item">
+               <div class="feature-icon">⚡</div>
+               <h3>Hızlı Yükleme</h3>
+               <p>Modern teknolojiler sayesinde saniyeler içinde oyuna başlayın</p>
+             </div>
+             
+             <div class="feature-item">
+               <div class="feature-icon">🔒</div>
+               <h3>Güvenli Platform</h3>
+               <p>SSL sertifikası ve güvenlik protokolleri ile korunan platform</p>
+             </div>
+             
+             <div class="feature-item">
+               <div class="feature-icon">📱</div>
+               <h3>Mobil Uyumlu</h3>
+               <p>Tüm cihazlarda mükemmel oyun deneyimi</p>
+             </div>
+           </div>
+
+           <div class="team-section">
+             <h3>👥 Ekibimiz</h3>
+             <p>
+               Deneyimli geliştirici ekibimiz, oyuncularımızın beklentilerini aşan 
+               oyunlar geliştirmek için sürekli kendini geliştiriyor. Modern oyun 
+               teknolojileri ve yaratıcı tasarım anlayışımızla fark yaratıyoruz.
+             </p>
+           </div>
+
+           <div class="contact-info">
+             <h3>📞 İletişim</h3>
+             <div class="contact-grid">
+               <div class="contact-item">
+                 <strong>Email:</strong> info@roboprojectlite.com
+               </div>
+               <div class="contact-item">
+                 <strong>Destek:</strong> support@roboprojectlite.com
+               </div>
+               <div class="contact-item">
+                 <strong>Adres:</strong> İstanbul, Türkiye
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </section>
+
    <!-- Games Section -->
    <section class="games-section" id="games">
      <div class="container">
@@ -644,14 +855,14 @@
          desc: "Galaksiler arası epik savaşlar!",
          category: "aksiyon",
          img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=200&fit=crop",
-         link: "#"
+         link: "Yükleme ekranları/Yükleme4.html"
        },
        {
          title: "Strateji Krallığı",
          desc: "Krallığınızı kurun ve genişletin!",
          category: "strateji",
          img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=200&fit=crop",
-         link: "#"
+         link: "Yükleme ekranları/Yükleme5.html"
        },
        {
          title: "Zombi Hayatta Kalma",
@@ -672,7 +883,7 @@
          desc: "Dünya kupasını kazanın!",
          category: "spor",
          img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop",
-         link: "#"
+         link: "Yükleme ekranları/Yükleme6.html"
        }
      ];
 
