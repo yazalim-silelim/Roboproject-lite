@@ -234,6 +234,13 @@
       background: rgba(139, 92, 246, 0.3);
       transform: translateY(-2px);
     }
+
+    .puzzle-info {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 0.5rem;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -264,6 +271,7 @@
   <div class="level-indicator">
     <h4>📊 Seviye</h4>
     <div class="level-number" id="levelNumber">1</div>
+    <div class="puzzle-info" id="puzzleInfo">Sayı Sıralaması</div>
   </div>
 
   <button class="hint-button" onclick="showHint()">💡 İpucu</button>
@@ -322,55 +330,106 @@
     let pieceSize = 80;
     let gridStartX = 0;
     let gridStartY = 0;
+    let currentPuzzleType = 0;
 
-    // Tuş durumları
-    const keys = {};
+    // 20 farklı puzzle türü
+    const puzzleTypes = [
+        { name: "Sayı Sıralaması", type: "numbers", grid: 3, description: "1'den 9'a kadar sayıları sırala" },
+        { name: "Harf Sıralaması", type: "letters", grid: 3, description: "A'dan I'ya kadar harfleri sırala" },
+        { name: "Renk Sıralaması", type: "colors", grid: 3, description: "Renkleri gökkuşağı sırasına diz" },
+        { name: "Şekil Sıralaması", type: "shapes", grid: 3, description: "Şekilleri boyuta göre sırala" },
+        { name: "Emoji Sıralaması", type: "emojis", grid: 3, description: "Emojileri sıraya diz" },
+        { name: "4x4 Sayılar", type: "numbers", grid: 4, description: "1'den 16'ya kadar sayıları sırala" },
+        { name: "4x4 Harfler", type: "letters", grid: 4, description: "A'dan P'ye kadar harfleri sırala" },
+        { name: "4x4 Renkler", type: "colors", grid: 4, description: "16 farklı rengi sırala" },
+        { name: "4x4 Şekiller", type: "shapes", grid: 4, description: "16 farklı şekli sırala" },
+        { name: "4x4 Emojiler", type: "emojis", grid: 4, description: "16 farklı emojiyi sırala" },
+        { name: "5x5 Sayılar", type: "numbers", grid: 5, description: "1'den 25'e kadar sayıları sırala" },
+        { name: "5x5 Harfler", type: "letters", grid: 5, description: "A'dan Y'ye kadar harfleri sırala" },
+        { name: "5x5 Renkler", type: "colors", grid: 5, description: "25 farklı rengi sırala" },
+        { name: "5x5 Şekiller", type: "shapes", grid: 5, description: "25 farklı şekli sırala" },
+        { name: "5x5 Emojiler", type: "emojis", grid: 5, description: "25 farklı emojiyi sırala" },
+        { name: "6x6 Sayılar", type: "numbers", grid: 6, description: "1'den 36'ya kadar sayıları sırala" },
+        { name: "6x6 Harfler", type: "letters", grid: 6, description: "A'dan Z'ye + 10 harf daha" },
+        { name: "6x6 Renkler", type: "colors", grid: 6, description: "36 farklı rengi sırala" },
+        { name: "6x6 Şekiller", type: "shapes", grid: 6, description: "36 farklı şekli sırala" },
+        { name: "6x6 Emojiler", type: "emojis", grid: 6, description: "36 farklı emojiyi sırala" }
+    ];
+
+    // Puzzle türüne göre içerik oluştur
+    function getPuzzleContent(type, index) {
+        switch(type) {
+            case "numbers":
+                return (index + 1).toString();
+            case "letters":
+                return String.fromCharCode(65 + index); // A, B, C...
+            case "colors":
+                const colors = ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜', '🟫', '🟨', '🟧', '🟥', '🟦', '🟪', '🟩', '🟨', '🟧', '🟥', '🟦', '🟪', '🟩', '🟨', '🟧', '🟥', '🟦', '🟪', '🟩', '🟨'];
+                return colors[index];
+            case "shapes":
+                const shapes = ['●', '■', '▲', '◆', '★', '♦', '♠', '♣', '♥', '⚫', '⚪', '🔶', '🔷', '🔸', '🔹', '🔺', '🔻', '💎', '🔮', '🎯', '🎲', '🎪', '🎨', '🎭', '🎪', '🎨', '🎭', '🎪', '🎨', '🎭', '🎪', '🎨', '🎭', '🎪', '🎨', '🎭', '🎪'];
+                return shapes[index];
+            case "emojis":
+                const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕'];
+                return emojis[index];
+            default:
+                return (index + 1).toString();
+        }
+    }
 
     // Puzzle parçalarını oluştur
     function createPuzzle() {
-      puzzlePieces = [];
-      targetPositions = [];
-      
-      // Grid pozisyonunu hesapla
-      gridStartX = (canvas.width - gridSize * pieceSize) / 2;
-      gridStartY = (canvas.height - gridSize * pieceSize) / 2;
-      
-      // Hedef pozisyonları oluştur
-      for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-          targetPositions.push({
-            x: gridStartX + col * pieceSize,
-            y: gridStartY + row * pieceSize,
-            number: row * gridSize + col + 1
-          });
+        puzzlePieces = [];
+        targetPositions = [];
+        
+        const puzzleType = puzzleTypes[currentPuzzleType];
+        gridSize = puzzleType.grid;
+        pieceSize = Math.max(60, 120 - (level - 1) * 10);
+        
+        // Grid pozisyonunu hesapla
+        gridStartX = (canvas.width - gridSize * pieceSize) / 2;
+        gridStartY = (canvas.height - gridSize * pieceSize) / 2;
+        
+        // Hedef pozisyonları oluştur
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                const index = row * gridSize + col;
+                targetPositions.push({
+                    x: gridStartX + col * pieceSize,
+                    y: gridStartY + row * pieceSize,
+                    content: getPuzzleContent(puzzleType.type, index),
+                    number: index + 1
+                });
+            }
         }
-      }
-      
-      // Puzzle parçalarını oluştur (karışık)
-      const numbers = [];
-      for (let i = 1; i <= gridSize * gridSize; i++) {
-        numbers.push(i);
-      }
-      
-      // Fisher-Yates karıştırma algoritması
-      for (let i = numbers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
-      }
-      
-      // Parçaları rastgele pozisyonlara yerleştir
-      for (let i = 0; i < numbers.length; i++) {
-        puzzlePieces.push({
-          x: Math.random() * (canvas.width - pieceSize),
-          y: Math.random() * (canvas.height - pieceSize),
-          width: pieceSize,
-          height: pieceSize,
-          number: numbers[i],
-          targetX: targetPositions[i].x,
-          targetY: targetPositions[i].y,
-          isInPlace: false
-        });
-      }
+        
+        // Puzzle parçalarını oluştur (karışık)
+        const numbers = [];
+        for (let i = 1; i <= gridSize * gridSize; i++) {
+            numbers.push(i);
+        }
+        
+        // Fisher-Yates karıştırma algoritması
+        for (let i = numbers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+        }
+        
+        // Parçaları rastgele pozisyonlara yerleştir
+        for (let i = 0; i < numbers.length; i++) {
+            const targetIndex = numbers[i] - 1;
+            puzzlePieces.push({
+                x: Math.random() * (canvas.width - pieceSize),
+                y: Math.random() * (canvas.height - pieceSize),
+                width: pieceSize,
+                height: pieceSize,
+                number: numbers[i],
+                content: getPuzzleContent(puzzleType.type, targetIndex),
+                targetX: targetPositions[targetIndex].x,
+                targetY: targetPositions[targetIndex].y,
+                isInPlace: false
+            });
+        }
     }
 
     // Fare olayları
@@ -506,7 +565,7 @@
         ctx.fillStyle = 'rgba(139, 92, 246, 0.5)';
         ctx.font = '16px Inter';
         ctx.textAlign = 'center';
-        ctx.fillText(target.number.toString(), target.x + pieceSize / 2, target.y + pieceSize / 2 + 6);
+        ctx.fillText(target.content, target.x + pieceSize / 2, target.y + pieceSize / 2 + 6);
       });
       
       // Puzzle parçalarını çiz
@@ -517,11 +576,11 @@
         
         // Parça gövdesi
         if (piece.isInPlace) {
-          ctx.fillStyle = '#10b981';
+            ctx.fillStyle = '#10b981';
         } else if (selectedPiece === piece) {
-          ctx.fillStyle = '#f59e0b';
+            ctx.fillStyle = '#f59e0b';
         } else {
-          ctx.fillStyle = '#8b5cf6';
+            ctx.fillStyle = '#8b5cf6';
         }
         
         ctx.fillRect(piece.x, piece.y, piece.width, piece.height);
@@ -531,11 +590,15 @@
         ctx.lineWidth = 2;
         ctx.strokeRect(piece.x, piece.y, piece.width, piece.height);
         
-        // Parça numarası
+        // Parça içeriği
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 24px Inter';
+        if (puzzleTypes[currentPuzzleType].type === "emojis" || puzzleTypes[currentPuzzleType].type === "colors") {
+            ctx.font = 'bold 20px Inter';
+        } else {
+            ctx.font = 'bold 24px Inter';
+        }
         ctx.textAlign = 'center';
-        ctx.fillText(piece.number.toString(), piece.x + pieceSize / 2, piece.y + pieceSize / 2 + 8);
+        ctx.fillText(piece.content, piece.x + pieceSize / 2, piece.y + pieceSize / 2 + 8);
       });
     }
 
@@ -553,37 +616,49 @@
       document.getElementById('score').textContent = score;
       document.getElementById('hints').textContent = hints;
       document.getElementById('levelNumber').textContent = level;
+      document.getElementById('puzzleInfo').textContent = puzzleTypes[currentPuzzleType].name;
     }
 
     // Sonraki seviye
     function nextLevel() {
-      level++;
-      gridSize = Math.min(gridSize + 1, 6); // Maksimum 6x6
-      pieceSize = Math.max(60, 120 - (level - 1) * 10); // Parça boyutunu azalt
-      
-      moves = 0;
-      time = 0;
-      hints = Math.min(hints + 1, 5); // Her seviyede 1 ipucu ekle
-      puzzleSolved = false;
-      
-      document.getElementById('gameOver').style.display = 'none';
-      createPuzzle();
-      startCountdown();
+        level++;
+        
+        // Puzzle türünü değiştir
+        if (level <= 20) {
+            currentPuzzleType = level - 1;
+        } else {
+            // 20 puzzle tamamlandıysa başa dön
+            currentPuzzleType = 0;
+            level = 1;
+        }
+        
+        gridSize = puzzleTypes[currentPuzzleType].grid;
+        pieceSize = Math.max(60, 120 - (level - 1) * 10);
+        
+        moves = 0;
+        time = 0;
+        hints = Math.min(hints + 1, 5);
+        puzzleSolved = false;
+        
+        document.getElementById('gameOver').style.display = 'none';
+        createPuzzle();
+        startCountdown();
     }
 
     // Oyunu yeniden başlat
     function restartGame() {
-      level = 1;
-      gridSize = 3;
-      pieceSize = 80;
-      moves = 0;
-      time = 0;
-      score = 0;
-      hints = 3;
-      puzzleSolved = false;
-      
-      createPuzzle();
-      startCountdown();
+        level = 1;
+        currentPuzzleType = 0;
+        gridSize = 3;
+        pieceSize = 80;
+        moves = 0;
+        time = 0;
+        score = 0;
+        hints = 3;
+        puzzleSolved = false;
+        
+        createPuzzle();
+        startCountdown();
     }
 
     // Geri sayım
