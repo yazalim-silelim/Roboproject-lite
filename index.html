@@ -3,243 +3,716 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RoboProject Lite</title>
+  <title>RoboProject Lite - Modern Oyun Platformu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
+    * {
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Modern Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+      border-radius: 4px;
+    }
+
+    /* Container */
     .container {
-      flex: 1;
       max-width: 1400px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 0 20px;
     }
 
-    /* Header */
-    header {
-      background: linear-gradient(90deg, #2d2d2d, #3d3d3d);
-      padding: 25px;
-      text-align: center;
-      border-radius: 14px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
-    }
-    h1 {
-      color: #ff6600;
-      margin: 0;
-      font-size: 2.5rem;
-      text-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
-    }
-    header p {
-      margin: 8px 0 0;
-      color: #bbb;
-      font-size: 1rem;
-    }
-
-    /* Arama ve Filtre */
-    .controls {
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      align-items: center;
       justify-content: center;
-      margin-bottom: 25px;
-    }
-    .controls input,
-    .controls select {
-      padding: 12px 15px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 15px;
-      transition: 0.3s;
-    }
-    .controls input {
-      flex: 1;
-      min-width: 220px;
-    }
-    .controls input:focus {
-      box-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
-    }
-    .controls select {
-      background-color: #2d2d2d;
-      color: white;
-      cursor: pointer;
-    }
-
-    /* Oyun Kartları */
-    .game-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 25px;
-    }
-    @media (min-width: 768px) {
-      .game-list {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (min-width: 1024px) {
-      .game-list {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    @media (min-width: 1400px) {
-      .game-list {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .game-card {
-      background-color: #222;
-      border-radius: 14px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-    }
-    .game-card:hover {
-      transform: translateY(-8px) scale(1.04);
-      box-shadow: 0 15px 30px rgba(255, 102, 0, 0.4);
-    }
-    .game-card:active {
-      transform: scale(0.97);
-    }
-
-    .game-thumbnail {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      background-color: #444;
-    }
-
-    .game-info {
-      padding: 18px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .game-title {
-      font-size: 20px;
-      margin: 0 0 10px 0;
-      color: #ff9933;
-      font-weight: bold;
-    }
-    .game-desc {
-      font-size: 14px;
-      color: #ccc;
-      margin: 0;
-      line-height: 1.5;
-      flex: 1;
-    }
-
-    /* Footer */
-    footer {
       text-align: center;
-      padding: 18px;
-      color: #888;
-      border-top: 1px solid #333;
-      font-size: 14px;
-      background: #111;
-      border-radius: 12px 12px 0 0;
-      margin-top: 30px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>RoboProject Lite</h1>
-      <p>🎮 3D Oyun Dünyasına Hoş Geldiniz!</p>
-    </header>
-
-    <!-- Arama ve Filtre -->
-    <div class="controls">
-      <input type="text" id="search" placeholder="🔍 Oyun ara..." />
-      <select id="category">
-        <option value="all">Tümü</option>
-        <option value="yarış">Yarış</option>
-        <option value="macera">Macera</option>
-      </select>
-    </div>
-
-    <!-- Oyun Listesi -->
-    <div class="game-list" id="gameList"></div>
-  </div>
-
-  <footer>RoboProject Lite © 2026 - Basit 3D Oyun Platformu</footer>
-
-  <script>
-    // 🎮 Oyun listesi
-    const games = [
-      {
-        title: "Araba Yarışı",
-        desc: "Hızlı arabanızla pistte zafer kazanın!",
-        category: "yarış",
-        img: "data:image/jpeg;base64,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",
-        link: "Yükleme ekranları/Yükleme1.html"
-      },
-      {
-        title: "Süper Yarış ",
-        desc: "Farklı araçlarla heyecan dolu yarışlar!",
-        category: "yarış",
-        img: "https://th.bing.com/th/id/OIP.bacWE2DlJQTSbG6kvNrzegHaEK?w=300&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-        link: "Yükleme ekranları/Yükleme2.html"
-      },
-      {
-        title: "Pist Macerası",
-        desc: "Zorlu pistlerde becerilerinizi test edin!",
-        category: "macera",
-        img: "images/advanture.png",
-        link: "Yükleme ekranları/Yükleme3.html"
-      }
-    ];
-
-    const gameList = document.getElementById("gameList");
-    const searchInput = document.getElementById("search");
-    const categorySelect = document.getElementById("category");
-
-    // Kart oluşturma
-    function renderGames() {
-      gameList.innerHTML = "";
-      const searchText = searchInput.value.toLowerCase();
-      const selectedCategory = categorySelect.value;
-
-      games.forEach(game => {
-        if (
-          (selectedCategory === "all" || game.category === selectedCategory) &&
-          game.title.toLowerCase().includes(searchText)
-        ) {
-          const card = document.createElement("div");
-          card.className = "game-card";
-          card.onclick = () => (window.location.href = game.link);
-
-          card.innerHTML = `
-            <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
-            <div class="game-info">
-              <h3 class="game-title">${game.title}</h3>
-              <p class="game-desc">${game.desc}</p>
-            </div>
-          `;
-          gameList.appendChild(card);
-        }
-      });
+      overflow: hidden;
     }
 
-    searchInput.addEventListener("input", renderGames);
-    categorySelect.addEventListener("change", renderGames);
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+      z-index: 1;
+    }
 
-    // İlk yükleme
-    renderGames();
-  </script>
-</body>
-</html>
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      z-index: 0;
+    }
 
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
 
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      background: linear-gradient(45deg, #00d4ff, #ff6b6b, #4ecdc4, #45b7d1);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 2rem;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #00d4ff, #0099cc);
+      color: white;
+      box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-3px);
+    }
+
+    /* Floating Elements */
+    .floating-element {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(255, 107, 107, 0.1));
+      border-radius: 50%;
+      filter: blur(40px);
+      animation: float 6s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    .floating-element:nth-child(1) {
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+      top: 60%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+         @keyframes float {
+       0%, 100% { transform: translateY(0px) rotate(0deg); }
+       50% { transform: translateY(-20px) rotate(180deg); }
+     }
+
+     /* Search Section */
+     .search-section {
+       padding: 4rem 0;
+       background: rgba(255, 255, 255, 0.02);
+       backdrop-filter: blur(20px);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       margin: 2rem 0;
+       border-radius: 20px;
+     }
+
+     .search-container {
+       max-width: 600px;
+       margin: 0 auto;
+       text-align: center;
+     }
+
+     .search-title {
+       font-size: 2rem;
+       font-weight: 600;
+       margin-bottom: 2rem;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .search-controls {
+       display: flex;
+       gap: 1rem;
+       justify-content: center;
+       flex-wrap: wrap;
+       margin-bottom: 2rem;
+     }
+
+     .search-input {
+       flex: 1;
+       min-width: 300px;
+       padding: 1rem 1.5rem;
+       border: 2px solid rgba(255, 255, 255, 0.1);
+       border-radius: 50px;
+       background: rgba(255, 255, 255, 0.05);
+       color: white;
+       font-size: 1rem;
+       backdrop-filter: blur(10px);
+       transition: all 0.3s ease;
+     }
+
+     .search-input:focus {
+       outline: none;
+       border-color: #00d4ff;
+       box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+       background: rgba(255, 255, 255, 0.1);
+     }
+
+     .search-select {
+       padding: 1rem 1.5rem;
+       border: 2px solid rgba(255, 255, 255, 0.1);
+       border-radius: 50px;
+       background: rgba(255, 255, 255, 0.05);
+       color: white;
+       font-size: 1rem;
+       cursor: pointer;
+       backdrop-filter: blur(10px);
+       transition: all 0.3s ease;
+     }
+
+     .search-select:focus {
+       outline: none;
+       border-color: #00d4ff;
+     }
+
+     .search-select option {
+       background: #1a1a2e;
+       color: white;
+     }
+
+     /* Games Section */
+     .games-section {
+       padding: 4rem 0;
+     }
+
+     .games-title {
+       text-align: center;
+       font-size: 3rem;
+       font-weight: 700;
+       margin-bottom: 3rem;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .game-list {
+       display: grid;
+       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+       gap: 2rem;
+       margin-top: 2rem;
+     }
+
+     @media (min-width: 768px) {
+       .game-list {
+         grid-template-columns: repeat(2, 1fr);
+       }
+     }
+     @media (min-width: 1024px) {
+       .game-list {
+         grid-template-columns: repeat(3, 1fr);
+       }
+     }
+     @media (min-width: 1400px) {
+       .game-list {
+         grid-template-columns: repeat(4, 1fr);
+       }
+     }
+
+     .game-card {
+       background: rgba(255, 255, 255, 0.05);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       border-radius: 20px;
+       overflow: hidden;
+       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+       cursor: pointer;
+       backdrop-filter: blur(20px);
+       position: relative;
+       display: flex;
+       flex-direction: column;
+     }
+
+     .game-card::before {
+       content: '';
+       position: absolute;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(255, 107, 107, 0.1));
+       opacity: 0;
+       transition: opacity 0.3s ease;
+       z-index: 1;
+     }
+
+     .game-card:hover {
+       transform: translateY(-10px) scale(1.02);
+       border-color: rgba(0, 212, 255, 0.5);
+       box-shadow: 0 25px 50px rgba(0, 212, 255, 0.2);
+     }
+
+     .game-card:hover::before {
+       opacity: 1;
+     }
+
+     .game-card:active {
+       transform: scale(0.98);
+     }
+
+     .game-thumbnail {
+       width: 100%;
+       height: 200px;
+       object-fit: cover;
+       background: linear-gradient(45deg, #1a1a2e, #16213e);
+       position: relative;
+       z-index: 2;
+     }
+
+     .game-info {
+       padding: 1.5rem;
+       flex: 1;
+       display: flex;
+       flex-direction: column;
+       position: relative;
+       z-index: 2;
+     }
+
+     .game-title {
+       font-size: 1.5rem;
+       margin: 0 0 1rem 0;
+       color: #ffffff;
+       font-weight: 600;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .game-desc {
+       font-size: 1rem;
+       color: rgba(255, 255, 255, 0.8);
+       margin: 0;
+       line-height: 1.6;
+       flex: 1;
+     }
+
+     .game-category {
+       display: inline-block;
+       padding: 0.5rem 1rem;
+       background: linear-gradient(45deg, #00d4ff, #0099cc);
+       color: white;
+       border-radius: 20px;
+       font-size: 0.8rem;
+       font-weight: 500;
+       margin-top: 1rem;
+       align-self: flex-start;
+     }
+
+     /* Stats Section */
+     .stats-section {
+       padding: 4rem 0;
+       background: rgba(255, 255, 255, 0.02);
+       backdrop-filter: blur(20px);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       margin: 2rem 0;
+       border-radius: 20px;
+     }
+
+     .stats-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+       gap: 2rem;
+       text-align: center;
+     }
+
+     .stat-item {
+       padding: 2rem;
+     }
+
+     .stat-number {
+       font-size: 3rem;
+       font-weight: 800;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+       margin-bottom: 0.5rem;
+     }
+
+     .stat-label {
+       color: rgba(255, 255, 255, 0.8);
+       font-size: 1.1rem;
+       font-weight: 500;
+     }
+
+     /* Footer */
+     footer {
+       text-align: center;
+       padding: 3rem 0;
+       color: rgba(255, 255, 255, 0.6);
+       border-top: 1px solid rgba(255, 255, 255, 0.1);
+       background: rgba(0, 0, 0, 0.3);
+       backdrop-filter: blur(20px);
+       margin-top: 4rem;
+     }
+
+     .footer-content {
+       max-width: 600px;
+       margin: 0 auto;
+     }
+
+     .footer-title {
+       font-size: 1.5rem;
+       font-weight: 600;
+       margin-bottom: 1rem;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .footer-text {
+       line-height: 1.6;
+       margin-bottom: 2rem;
+     }
+
+     .social-links {
+       display: flex;
+       gap: 1rem;
+       justify-content: center;
+       margin-top: 1rem;
+     }
+
+     .social-link {
+       width: 50px;
+       height: 50px;
+       border-radius: 50%;
+       background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       color: white;
+       text-decoration: none;
+       transition: all 0.3s ease;
+       font-size: 1.2rem;
+     }
+
+     .social-link:hover {
+       transform: translateY(-3px);
+       box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+     }
+
+     /* Responsive Design */
+     @media (max-width: 768px) {
+       .hero h1 {
+         font-size: 3rem;
+       }
+       
+       .hero p {
+         font-size: 1.2rem;
+       }
+       
+       .hero-buttons {
+         flex-direction: column;
+         align-items: center;
+       }
+       
+       .btn {
+         width: 100%;
+         max-width: 300px;
+         justify-content: center;
+       }
+       
+       .search-controls {
+         flex-direction: column;
+         align-items: center;
+       }
+       
+       .search-input,
+       .search-select {
+         min-width: 100%;
+         max-width: 300px;
+       }
+       
+       .stats-grid {
+         grid-template-columns: 1fr;
+       }
+     }
+   </style>
+ </head>
+ <body>
+   <!-- Hero Section -->
+   <section class="hero">
+     <div class="floating-element"></div>
+     <div class="floating-element"></div>
+     <div class="floating-element"></div>
+     
+     <div class="hero-content">
+       <h1>RoboProject Lite</h1>
+       <p>🎮 Modern 3D Oyun Dünyasına Hoş Geldiniz! En yeni teknolojilerle geliştirilmiş oyunları keşfedin.</p>
+       <div class="hero-buttons">
+         <a href="#games" class="btn btn-primary">
+           <i class="fas fa-gamepad"></i>
+           Oyunları Keşfet
+         </a>
+         <a href="#about" class="btn btn-secondary">
+           <i class="fas fa-info-circle"></i>
+           Hakkında
+         </a>
+       </div>
+     </div>
+   </section>
+
+   <!-- Search Section -->
+   <section class="search-section">
+     <div class="container">
+       <div class="search-container">
+         <h2 class="search-title">🎯 Oyun Ara</h2>
+         <div class="search-controls">
+           <input type="text" id="search" class="search-input" placeholder="🔍 Oyun ara..." />
+           <select id="category" class="search-select">
+             <option value="all">Tüm Kategoriler</option>
+             <option value="yarış">🏁 Yarış</option>
+             <option value="macera">🗺️ Macera</option>
+             <option value="aksiyon">⚡ Aksiyon</option>
+             <option value="strateji">🧠 Strateji</option>
+             <option value="spor">⚽ Spor</option>
+           </select>
+         </div>
+       </div>
+     </div>
+   </section>
+
+   <!-- Stats Section -->
+   <section class="stats-section">
+     <div class="container">
+       <div class="stats-grid">
+         <div class="stat-item">
+           <div class="stat-number">50+</div>
+           <div class="stat-label">Oyun</div>
+         </div>
+         <div class="stat-item">
+           <div class="stat-number">10K+</div>
+           <div class="stat-label">Oyuncu</div>
+         </div>
+         <div class="stat-item">
+           <div class="stat-number">24/7</div>
+           <div class="stat-label">Destek</div>
+         </div>
+         <div class="stat-item">
+           <div class="stat-number">4.9★</div>
+           <div class="stat-label">Puan</div>
+         </div>
+       </div>
+     </div>
+   </section>
+
+   <!-- Games Section -->
+   <section class="games-section" id="games">
+     <div class="container">
+       <h2 class="games-title">🎮 Oyunlarımız</h2>
+       <div class="game-list" id="gameList"></div>
+     </div>
+   </section>
+
+   <!-- Footer -->
+   <footer>
+     <div class="container">
+       <div class="footer-content">
+         <h3 class="footer-title">RoboProject Lite</h3>
+         <p class="footer-text">Modern teknolojilerle geliştirilmiş 3D oyun platformu. En yeni oyunları keşfedin ve eğlencenin tadını çıkarın!</p>
+         <div class="social-links">
+           <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+           <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+           <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+           <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+         </div>
+         <p style="margin-top: 2rem; opacity: 0.7;">© 2026 RoboProject Lite - Tüm hakları saklıdır</p>
+       </div>
+     </div>
+   </footer>
+
+   <script>
+     // 🎮 Oyun listesi
+     const games = [
+       {
+         title: "Araba Yarışı",
+         desc: "Hızlı arabanızla pistte zafer kazanın!",
+         category: "yarış",
+         img: "data:image/jpeg;base64,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",
+         link: "Yükleme ekranları/Yükleme1.html"
+       },
+       {
+         title: "Süper Yarış ",
+         desc: "Farklı araçlarla heyecan dolu yarışlar!",
+         category: "yarış",
+         img: "https://th.bing.com/th/id/OIP.bacWE2DlJQTSbG6kvNrzegHaEK?w=300&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+         link: "Yükleme ekranları/Yükleme2.html"
+       },
+       {
+         title: "Pist Macerası",
+         desc: "Zorlu pistlerde becerilerinizi test edin!",
+         category: "macera",
+         img: "images/advanture.png",
+         link: "Yükleme ekranları/Yükleme3.html"
+       },
+       {
+         title: "Uzay Savaşı",
+         desc: "Galaksiler arası epik savaşlar!",
+         category: "aksiyon",
+         img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=200&fit=crop",
+         link: "#"
+       },
+       {
+         title: "Strateji Krallığı",
+         desc: "Krallığınızı kurun ve genişletin!",
+         category: "strateji",
+         img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=200&fit=crop",
+         link: "#"
+       },
+       {
+         title: "Zombi Hayatta Kalma",
+         desc: "Zombi istilasından kurtulun!",
+         category: "aksiyon",
+         img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=200&fit=crop",
+         link: "#"
+       },
+       {
+         title: "Puzzle Master",
+         desc: "Zeka oyunlarıyla beyninizi geliştirin!",
+         category: "strateji",
+         img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=200&fit=crop",
+         link: "#"
+       },
+       {
+         title: "Futbol Şampiyonası",
+         desc: "Dünya kupasını kazanın!",
+         category: "spor",
+         img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop",
+         link: "#"
+       }
+     ];
+
+     const gameList = document.getElementById("gameList");
+     const searchInput = document.getElementById("search");
+     const categorySelect = document.getElementById("category");
+
+     // Kart oluşturma
+     function renderGames() {
+       gameList.innerHTML = "";
+       const searchText = searchInput.value.toLowerCase();
+       const selectedCategory = categorySelect.value;
+
+       games.forEach(game => {
+         if (
+           (selectedCategory === "all" || game.category === selectedCategory) &&
+           game.title.toLowerCase().includes(searchText)
+         ) {
+           const card = document.createElement("div");
+           card.className = "game-card";
+           card.onclick = () => (window.location.href = game.link);
+
+           card.innerHTML = `
+             <img class="game-thumbnail" src="${game.img}" alt="${game.title}">
+             <div class="game-info">
+               <h3 class="game-title">${game.title}</h3>
+               <p class="game-desc">${game.desc}</p>
+               <span class="game-category">${game.category}</span>
+             </div>
+           `;
+           gameList.appendChild(card);
+         }
+       });
+     }
+
+     searchInput.addEventListener("input", renderGames);
+     categorySelect.addEventListener("change", renderGames);
+
+     // İlk yükleme
+     renderGames();
+   </script>
+ </body>
+ </html>
