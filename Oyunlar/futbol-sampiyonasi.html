@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Futbol Şampiyonası - RoboProject Lite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a5f1a 0%, #2d7a2d 25%, #3f953f 50%, #51b051 75%, #63cb63 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #00ff00, #32cd32);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-stats {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00ff00;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .game-canvas {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 80px);
+      background: linear-gradient(to bottom, #228b22 0%, #32cd32 50%, #90ee90 100%);
+    }
+
+    .game-over {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: 20px;
+      text-align: center;
+      border: 1px solid rgba(0, 255, 0, 0.3);
+      display: none;
+      z-index: 200;
+    }
+
+    .game-over h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #00ff00, #32cd32);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-over p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .restart-button {
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #00ff00, #32cd32);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .restart-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 255, 0, 0.3);
+    }
+
+    .back-button {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .instructions {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 0, 0.3);
+      max-width: 280px;
+      z-index: 150;
+    }
+
+    .instructions h3 {
+      color: #00ff00;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .instructions ul {
+      list-style: none;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    .instructions li::before {
+      content: '⚽ ';
+      margin-right: 0.5rem;
+    }
+
+    .countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8rem;
+      font-weight: 800;
+      color: #00ff00;
+      text-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+      z-index: 300;
+      display: none;
+    }
+
+    .score-display {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1rem;
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 0, 0.3);
+      z-index: 150;
+    }
+
+    .score-display h4 {
+      color: #00ff00;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .score-values {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .player-score {
+      text-align: center;
+    }
+
+    .player-score .score {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .player-score .name {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .vs {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-header">
+    <h1 class="game-title">⚽ Futbol Şampiyonası</h1>
+    <div class="game-stats">
+      <div class="stat">
+        <div class="stat-value" id="time">0</div>
+        <div class="stat-label">Süre (s)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="ballSpeed">0</div>
+        <div class="stat-label">Top Hızı</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="possession">50</div>
+        <div class="stat-label">Top Hakimiyeti (%)</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="back-button" onclick="goBack()">← Ana Sayfa</button>
+
+  <div class="score-display">
+    <h4>🏆 Skor</h4>
+    <div class="score-values">
+      <div class="player-score">
+        <div class="score" id="player1Score">0</div>
+        <div class="name">Oyuncu 1</div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="player-score">
+        <div class="score" id="player2Score">0</div>
+        <div class="name">Oyuncu 2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h3>⚽ Kontroller</h3>
+    <ul>
+      <li><strong>Oyuncu 1:</strong> WASD ile hareket</li>
+      <li><strong>Oyuncu 2:</strong> Ok tuşları ile hareket</li>
+      <li>Topa yaklaş ve gol at!</li>
+      <li>İlk 5 gol atan kazanır</li>
+    </ul>
+  </div>
+
+  <canvas class="game-canvas" id="gameCanvas"></canvas>
+
+  <div class="countdown" id="countdown">3</div>
+
+  <div class="game-over" id="gameOver">
+    <h2 id="winnerText">Oyun Bitti!</h2>
+    <p>Final Skor:</p>
+    <p>Oyuncu 1: <span id="finalScore1">0</span> - Oyuncu 2: <span id="finalScore2">0</span></p>
+    <p>Süre: <span id="finalTime">0</span> saniye</p>
+    <button class="restart-button" onclick="restartGame()">Tekrar Oyna</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Canvas boyutlarını ayarla
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 80;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Oyun değişkenleri
+    let gameRunning = false;
+    let gameStarted = false;
+    let time = 0;
+    let player1Score = 0;
+    let player2Score = 0;
+    let gameOver = false;
+
+    // Oyuncular
+    const player1 = {
+      x: 100,
+      y: canvas.height / 2,
+      width: 40,
+      height: 60,
+      speed: 5,
+      color: '#4169e1'
+    };
+
+    const player2 = {
+      x: canvas.width - 140,
+      y: canvas.height / 2,
+      width: 40,
+      height: 60,
+      speed: 5,
+      color: '#ff6b6b'
+    };
+
+    // Top
+    const ball = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: 15,
+      vx: 0,
+      vy: 0,
+      speed: 0,
+      maxSpeed: 12,
+      friction: 0.98
+    };
+
+    // Kaleler
+    const goal1 = {
+      x: 0,
+      y: canvas.height / 2 - 100,
+      width: 20,
+      height: 200
+    };
+
+    const goal2 = {
+      x: canvas.width - 20,
+      y: canvas.height / 2 - 100,
+      width: 20,
+      height: 200
+    };
+
+    // Tuş durumları
+    const keys = {};
+
+    // Tuş olayları
+    document.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    // Oyuncu hareketi
+    function updatePlayers() {
+      // Oyuncu 1 (WASD)
+      if (keys['w']) player1.y = Math.max(0, player1.y - player1.speed);
+      if (keys['s']) player1.y = Math.min(canvas.height - player1.height, player1.y + player1.speed);
+      if (keys['a']) player1.x = Math.max(0, player1.x - player1.speed);
+      if (keys['d']) player1.x = Math.min(canvas.width / 2 - player1.width, player1.x + player1.speed);
+
+      // Oyuncu 2 (Ok tuşları)
+      if (keys['arrowup']) player2.y = Math.max(0, player2.y - player2.speed);
+      if (keys['arrowdown']) player2.y = Math.min(canvas.height - player2.height, player2.y + player2.speed);
+      if (keys['arrowleft']) player2.x = Math.max(canvas.width / 2, player2.x - player2.speed);
+      if (keys['arrowright']) player2.x = Math.min(canvas.width - player2.width, player2.x + player2.speed);
+    }
+
+    // Top fiziği
+    function updateBall() {
+      // Top hareketi
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      // Sürtünme
+      ball.vx *= ball.friction;
+      ball.vy *= ball.friction;
+
+      // Top hızını hesapla
+      ball.speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+
+      // Duvarlardan sekme
+      if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= canvas.height) {
+        ball.vy *= -0.8;
+        ball.y = Math.max(ball.radius, Math.min(canvas.height - ball.radius, ball.y));
+      }
+
+      if (ball.x - ball.radius <= 0 || ball.x + ball.radius >= canvas.width) {
+        ball.vx *= -0.8;
+        ball.x = Math.max(ball.radius, Math.min(canvas.width - ball.radius, ball.x));
+      }
+
+      // Oyuncu-top çarpışması
+      checkPlayerBallCollision(player1);
+      checkPlayerBallCollision(player2);
+
+      // Gol kontrolü
+      checkGoal();
+    }
+
+    // Oyuncu-top çarpışması
+    function checkPlayerBallCollision(player) {
+      const dx = ball.x - (player.x + player.width / 2);
+      const dy = ball.y - (player.y + player.height / 2);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < ball.radius + Math.max(player.width, player.height) / 2) {
+        // Çarpışma yönünü hesapla
+        const angle = Math.atan2(dy, dx);
+        const force = 8;
+
+        // Topu oyuncudan uzağa it
+        ball.vx = Math.cos(angle) * force;
+        ball.vy = Math.sin(angle) * force;
+
+        // Topu oyuncunun dışına taşı
+        const pushDistance = ball.radius + Math.max(player.width, player.height) / 2;
+        ball.x = player.x + player.width / 2 + Math.cos(angle) * pushDistance;
+        ball.y = player.y + player.height / 2 + Math.sin(angle) * pushDistance;
+      }
+    }
+
+    // Gol kontrolü
+    function checkGoal() {
+      // Sol kale (Oyuncu 2 gol atar)
+      if (ball.x - ball.radius <= goal1.x + goal1.width &&
+          ball.y >= goal1.y && ball.y <= goal1.y + goal1.height) {
+        player2Score++;
+        resetBall();
+        updateScore();
+        checkGameEnd();
+      }
+
+      // Sağ kale (Oyuncu 1 gol atar)
+      if (ball.x + ball.radius >= goal2.x &&
+          ball.y >= goal2.y && ball.y <= goal2.y + goal2.height) {
+        player1Score++;
+        resetBall();
+        updateScore();
+        checkGameEnd();
+      }
+    }
+
+    // Topu sıfırla
+    function resetBall() {
+      ball.x = canvas.width / 2;
+      ball.y = canvas.height / 2;
+      ball.vx = 0;
+      ball.vy = 0;
+    }
+
+    // Skoru güncelle
+    function updateScore() {
+      document.getElementById('player1Score').textContent = player1Score;
+      document.getElementById('player2Score').textContent = player2Score;
+    }
+
+    // Oyun bitişi kontrolü
+    function checkGameEnd() {
+      if (player1Score >= 5 || player2Score >= 5) {
+        gameOver = true;
+        gameRunning = false;
+        
+        const winner = player1Score >= 5 ? "Oyuncu 1" : "Oyuncu 2";
+        document.getElementById('winnerText').textContent = `${winner} Kazandı!`;
+        document.getElementById('finalScore1').textContent = player1Score;
+        document.getElementById('finalScore2').textContent = player2Score;
+        document.getElementById('finalTime').textContent = Math.floor(time);
+        
+        setTimeout(() => {
+          document.getElementById('gameOver').style.display = 'block';
+        }, 1000);
+      }
+    }
+
+    // Oyun güncelleme
+    function update() {
+      if (!gameRunning) return;
+
+      time += 1/60;
+      updatePlayers();
+      updateBall();
+    }
+
+    // Çizim
+    function draw() {
+      // Arka planı temizle
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Saha çizgileri
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      
+      // Orta çizgi
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.stroke();
+      
+      // Orta daire
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 80, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Orta nokta
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.fill();
+
+      // Kaleler
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.fillRect(goal1.x, goal1.y, goal1.width, goal1.height);
+      ctx.fillRect(goal2.x, goal2.y, goal2.width, goal2.height);
+
+      // Oyuncular
+      // Oyuncu 1
+      ctx.fillStyle = player1.color;
+      ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
+      
+      // Oyuncu 1 gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(player1.x + 2, player1.y + player1.height - 5, player1.width - 4, 8);
+      
+      // Oyuncu 1 detayları
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(player1.x + 8, player1.y + 10, 24, 20);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player1.x + 12, player1.y + 14, 16, 12);
+
+      // Oyuncu 2
+      ctx.fillStyle = player2.color;
+      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+      
+      // Oyuncu 2 gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(player2.x + 2, player2.y + player2.height - 5, player2.width - 4, 8);
+      
+      // Oyuncu 2 detayları
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(player2.x + 8, player2.y + 10, 24, 20);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player2.x + 12, player2.y + 14, 16, 12);
+
+      // Top
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Top gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.arc(ball.x + 3, ball.y + 3, ball.radius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Top deseni
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Top merkezi
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Oyun döngüsü
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // İstatistikleri güncelle
+    function updateStats() {
+      document.getElementById('time').textContent = Math.floor(time);
+      document.getElementById('ballSpeed').textContent = Math.floor(ball.speed);
+      
+      // Top hakimiyeti hesapla
+      const player1Distance = Math.sqrt(
+        Math.pow(ball.x - (player1.x + player1.width / 2), 2) + 
+        Math.pow(ball.y - (player1.y + player1.height / 2), 2)
+      );
+      const player2Distance = Math.sqrt(
+        Math.pow(ball.x - (player2.x + player2.width / 2), 2) + 
+        Math.pow(ball.y - (player2.y + player2.height / 2), 2)
+      );
+      
+      const totalDistance = player1Distance + player2Distance;
+      const possession = totalDistance > 0 ? Math.round((1 - player1Distance / totalDistance) * 100) : 50;
+      document.getElementById('possession').textContent = possession;
+    }
+
+    // Oyunu yeniden başlat
+    function restartGame() {
+      time = 0;
+      player1Score = 0;
+      player2Score = 0;
+      gameOver = false;
+      
+      // Oyuncuları başlangıç pozisyonlarına getir
+      player1.x = 100;
+      player1.y = canvas.height / 2;
+      player2.x = canvas.width - 140;
+      player2.y = canvas.height / 2;
+      
+      resetBall();
+      updateScore();
+      document.getElementById('gameOver').style.display = 'none';
+      startCountdown();
+    }
+
+    // Geri sayım
+    function startCountdown() {
+      const countdown = document.getElementById('countdown');
+      countdown.style.display = 'block';
+      
+      let count = 3;
+      const countInterval = setInterval(() => {
+        countdown.textContent = count;
+        if (count <= 0) {
+          clearInterval(countInterval);
+          countdown.style.display = 'none';
+          gameRunning = true;
+          gameStarted = true;
+        }
+        count--;
+      }, 1000);
+    }
+
+    // Ana sayfaya dön
+    function goBack() {
+      window.location.href = '../index.html';
+    }
+
+    // Oyunu başlat
+    startCountdown();
+    gameLoop();
+
+    // İstatistikleri güncelle
+    setInterval(updateStats, 100);
+  </script>
+</body>
+</html>

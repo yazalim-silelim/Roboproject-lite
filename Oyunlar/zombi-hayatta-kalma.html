@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zombi Hayatta Kalma - RoboProject Lite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #2d1b1b 0%, #4a2c2c 25%, #6b3e3e 50%, #8f5a5a 75%, #b37676 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #ff0000, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-stats {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ff0000;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .game-canvas {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 80px);
+      background: linear-gradient(to bottom, #2d1b1b 0%, #4a2c2c 50%, #6b3e3e 100%);
+    }
+
+    .game-over {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      display: none;
+      z-index: 200;
+    }
+
+    .game-over h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #ff0000, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-over p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .restart-button {
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #ff0000, #ff6b6b);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .restart-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
+    }
+
+    .back-button {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .instructions {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      max-width: 250px;
+      z-index: 150;
+    }
+
+    .instructions h3 {
+      color: #ff0000;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .instructions ul {
+      list-style: none;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    .instructions li::before {
+      content: '🧟 ';
+      margin-right: 0.5rem;
+    }
+
+    .countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8rem;
+      font-weight: 800;
+      color: #ff0000;
+      text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+      z-index: 300;
+      display: none;
+    }
+
+    .wave-indicator {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1rem;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      z-index: 150;
+    }
+
+    .wave-indicator h4 {
+      color: #ff0000;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .wave-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-header">
+    <h1 class="game-title">🧟 Zombi Hayatta Kalma</h1>
+    <div class="game-stats">
+      <div class="stat">
+        <div class="stat-value" id="health">100</div>
+        <div class="stat-label">Can</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="ammo">30</div>
+        <div class="stat-label">Mermi</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="score">0</div>
+        <div class="stat-label">Puan</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="time">0</div>
+        <div class="stat-label">Süre (s)</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="back-button" onclick="goBack()">← Ana Sayfa</button>
+
+  <div class="wave-indicator">
+    <h4>🌊 Dalga</h4>
+    <div class="wave-number" id="waveNumber">1</div>
+  </div>
+
+  <div class="instructions">
+    <h3>🧟 Kontroller</h3>
+    <ul>
+      <li>WASD ile hareket</li>
+      <li>Fare ile nişan al</li>
+      <li>Sol tık ile ateş et</li>
+      <li>R ile mermi doldur</li>
+      <li>Zombilerden kaç!</li>
+    </ul>
+  </div>
+
+  <canvas class="game-canvas" id="gameCanvas"></canvas>
+
+  <div class="countdown" id="countdown">3</div>
+
+  <div class="game-over" id="gameOver">
+    <h2>Oyun Bitti!</h2>
+    <p>Hayatta Kalma Süresi: <span id="finalTime">0</span> saniye</p>
+    <p>Puanınız: <span id="finalScore">0</span></p>
+    <p>Öldürülen Zombi: <span id="zombiesKilled">0</span></p>
+    <p>Dalga: <span id="finalWave">1</span></p>
+    <button class="restart-button" onclick="restartGame()">Tekrar Dene</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Canvas boyutlarını ayarla
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 80;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Oyun değişkenleri
+    let gameRunning = false;
+    let gameStarted = false;
+    let health = 100;
+    let ammo = 30;
+    let score = 0;
+    let time = 0;
+    let wave = 1;
+    let zombiesKilled = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Oyuncu
+    const player = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      width: 40,
+      height: 40,
+      speed: 3
+    };
+
+    // Mermiler
+    let bullets = [];
+    // Zombiler
+    let zombies = [];
+    // Kan efektleri
+    let bloodEffects = [];
+    // Mermi kutuları
+    let ammoBoxes = [];
+    // Can paketleri
+    let healthPacks = [];
+
+    // Tuş durumları
+    const keys = {};
+
+    // Tuş olayları
+    document.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      if (e.key === 'r' && ammo < 30) {
+        reload();
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    // Fare olayları
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
+
+    canvas.addEventListener('click', (e) => {
+      if (ammo > 0) {
+        shoot();
+      }
+    });
+
+    // Mermi atma
+    function shoot() {
+      if (ammo <= 0) return;
+      
+      ammo--;
+      const angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+      const speed = 10;
+      
+      bullets.push({
+        x: player.x + player.width / 2,
+        y: player.y + player.height / 2,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 100
+      });
+    }
+
+    // Mermi doldurma
+    function reload() {
+      ammo = Math.min(ammo + 10, 30);
+    }
+
+    // Zombi oluşturma
+    function createZombie() {
+      const side = Math.floor(Math.random() * 4);
+      let x, y;
+      
+      switch(side) {
+        case 0: // üst
+          x = Math.random() * canvas.width;
+          y = -50;
+          break;
+        case 1: // sağ
+          x = canvas.width + 50;
+          y = Math.random() * canvas.height;
+          break;
+        case 2: // alt
+          x = Math.random() * canvas.width;
+          y = canvas.height + 50;
+          break;
+        case 3: // sol
+          x = -50;
+          y = Math.random() * canvas.height;
+          break;
+      }
+      
+      zombies.push({
+        x: x,
+        y: y,
+        width: 35,
+        height: 35,
+        speed: 1 + Math.random() * 0.5,
+        health: 2 + Math.floor(wave / 3)
+      });
+    }
+
+    // Mermi kutusu oluşturma
+    function createAmmoBox() {
+      if (Math.random() < 0.005) {
+        ammoBoxes.push({
+          x: Math.random() * (canvas.width - 30),
+          y: Math.random() * (canvas.height - 30),
+          width: 30,
+          height: 30
+        });
+      }
+    }
+
+    // Can paketi oluşturma
+    function createHealthPack() {
+      if (Math.random() < 0.003) {
+        healthPacks.push({
+          x: Math.random() * (canvas.width - 25),
+          y: Math.random() * (canvas.height - 25),
+          width: 25,
+          height: 25
+        });
+      }
+    }
+
+    // Çarpışma kontrolü
+    function checkCollision(rect1, rect2) {
+      return rect1.x < rect2.x + rect2.width &&
+             rect1.x + rect1.width > rect2.x &&
+             rect1.y < rect2.y + rect2.height &&
+             rect1.y + rect1.height > rect2.y;
+    }
+
+    // Oyun güncelleme
+    function update() {
+      if (!gameRunning) return;
+
+      // Zaman güncelle
+      time += 1/60;
+
+      // Oyuncu hareketi
+      if (keys['w'] || keys['arrowup']) {
+        player.y = Math.max(0, player.y - player.speed);
+      }
+      if (keys['s'] || keys['arrowdown']) {
+        player.y = Math.min(canvas.height - player.height, player.y + player.speed);
+      }
+      if (keys['a'] || keys['arrowleft']) {
+        player.x = Math.max(0, player.x - player.speed);
+      }
+      if (keys['d'] || keys['arrowright']) {
+        player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+      }
+
+      // Mermileri güncelle
+      bullets.forEach((bullet, index) => {
+        bullet.x += bullet.vx;
+        bullet.y += bullet.vy;
+        bullet.life--;
+        
+        if (bullet.life <= 0 || bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
+          bullets.splice(index, 1);
+        }
+      });
+
+      // Zombileri güncelle
+      zombies.forEach((zombie, index) => {
+        // Oyuncuya doğru hareket
+        const dx = player.x - zombie.x;
+        const dy = player.y - zombie.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 0) {
+          zombie.x += (dx / distance) * zombie.speed;
+          zombie.y += (dy / distance) * zombie.speed;
+        }
+        
+        // Oyuncuya çarpma kontrolü
+        if (checkCollision(player, zombie)) {
+          health -= 1;
+          zombies.splice(index, 1);
+          
+          // Kan efekti
+          for (let i = 0; i < 10; i++) {
+            bloodEffects.push({
+              x: player.x + Math.random() * player.width,
+              y: player.y + Math.random() * player.height,
+              vx: (Math.random() - 0.5) * 5,
+              vy: (Math.random() - 0.5) * 5,
+              life: 1,
+              decay: 0.02
+            });
+          }
+        }
+      });
+
+      // Mermi-zombi çarpışması
+      bullets.forEach((bullet, bulletIndex) => {
+        zombies.forEach((zombie, zombieIndex) => {
+          if (checkCollision(bullet, zombie)) {
+            zombie.health--;
+            bullets.splice(bulletIndex, 1);
+            
+            if (zombie.health <= 0) {
+              zombies.splice(zombieIndex, 1);
+              score += 10;
+              zombiesKilled++;
+              
+              // Kan efekti
+              for (let i = 0; i < 15; i++) {
+                bloodEffects.push({
+                  x: zombie.x + Math.random() * zombie.width,
+                  y: zombie.y + Math.random() * zombie.height,
+                  vx: (Math.random() - 0.5) * 8,
+                  vy: (Math.random() - 0.5) * 8,
+                  life: 1,
+                  decay: 0.015
+                });
+              }
+            }
+          }
+        });
+      });
+
+      // Kan efektlerini güncelle
+      bloodEffects.forEach((effect, index) => {
+        effect.x += effect.vx;
+        effect.y += effect.vy;
+        effect.life -= effect.decay;
+        
+        if (effect.life <= 0) {
+          bloodEffects.splice(index, 1);
+        }
+      });
+
+      // Mermi kutusu toplama
+      ammoBoxes.forEach((box, index) => {
+        if (checkCollision(player, box)) {
+          ammo = Math.min(ammo + 15, 30);
+          ammoBoxes.splice(index, 1);
+        }
+      });
+
+      // Can paketi toplama
+      healthPacks.forEach((pack, index) => {
+        if (checkCollision(player, pack)) {
+          health = Math.min(health + 25, 100);
+          healthPacks.splice(index, 1);
+        }
+      });
+
+      // Yeni zombiler oluştur
+      if (zombies.length < 5 + wave * 2) {
+        createZombie();
+      }
+
+      // Yeni mermi kutuları ve can paketleri
+      createAmmoBox();
+      createHealthPack();
+
+      // Dalga kontrolü
+      if (zombiesKilled >= wave * 10) {
+        wave++;
+        zombiesKilled = 0;
+      }
+
+      // Oyun bitişi kontrolü
+      if (health <= 0) {
+        gameOver();
+      }
+    }
+
+    // Çizim
+    function draw() {
+      // Arka planı temizle
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Kan efektleri
+      bloodEffects.forEach(effect => {
+        ctx.globalAlpha = effect.life;
+        ctx.fillStyle = '#8b0000';
+        ctx.fillRect(effect.x, effect.y, 3, 3);
+      });
+      ctx.globalAlpha = 1;
+
+      // Mermi kutuları
+      ammoBoxes.forEach(box => {
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(box.x, box.y, box.width, box.height);
+        ctx.fillStyle = '#000000';
+        ctx.fillText('A', box.x + 10, box.y + 20);
+      });
+
+      // Can paketleri
+      healthPacks.forEach(pack => {
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(pack.x, pack.y, pack.width, pack.height);
+        ctx.fillStyle = '#000000';
+        ctx.fillText('H', pack.x + 8, pack.y + 18);
+      });
+
+      // Mermiler
+      bullets.forEach(bullet => {
+        ctx.fillStyle = '#ffff00';
+        ctx.fillRect(bullet.x - 2, bullet.y - 2, 4, 4);
+      });
+
+      // Zombiler
+      zombies.forEach(zombie => {
+        // Zombi gövdesi
+        ctx.fillStyle = '#228b22';
+        ctx.fillRect(zombie.x, zombie.y, zombie.width, zombie.height);
+        
+        // Zombi kafa
+        ctx.fillStyle = '#32cd32';
+        ctx.fillRect(zombie.x + 5, zombie.y + 5, 25, 25);
+        
+        // Gözler
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(zombie.x + 10, zombie.y + 12, 4, 4);
+        ctx.fillRect(zombie.x + 21, zombie.y + 12, 4, 4);
+        
+        // Ağız
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(zombie.x + 15, zombie.y + 20, 5, 3);
+      });
+
+      // Oyuncu
+      // Ana gövde
+      ctx.fillStyle = '#4169e1';
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      // Oyuncu gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(player.x + 2, player.y + player.height - 5, player.width - 4, 8);
+      
+      // Kafa
+      ctx.fillStyle = '#ffdbac';
+      ctx.fillRect(player.x + 8, player.y + 5, 24, 20);
+      
+      // Gözler
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 12, player.y + 10, 3, 3);
+      ctx.fillRect(player.x + 25, player.y + 10, 3, 3);
+      
+      // Ağız
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 18, player.y + 18, 4, 2);
+      
+      // Silah
+      const angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+      const gunLength = 25;
+      const gunX = player.x + player.width / 2 + Math.cos(angle) * gunLength;
+      const gunY = player.y + player.height / 2 + Math.sin(angle) * gunLength;
+      
+      ctx.strokeStyle = '#333333';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(player.x + player.width / 2, player.y + player.height / 2);
+      ctx.lineTo(gunX, gunY);
+      ctx.stroke();
+    }
+
+    // Oyun döngüsü
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // İstatistikleri güncelle
+    function updateStats() {
+      document.getElementById('health').textContent = health;
+      document.getElementById('ammo').textContent = ammo;
+      document.getElementById('score').textContent = score;
+      document.getElementById('time').textContent = Math.floor(time);
+      document.getElementById('waveNumber').textContent = wave;
+    }
+
+    // Oyun bitişi
+    function gameOver() {
+      gameRunning = false;
+      document.getElementById('finalTime').textContent = Math.floor(time);
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('zombiesKilled').textContent = zombiesKilled;
+      document.getElementById('finalWave').textContent = wave;
+      document.getElementById('gameOver').style.display = 'block';
+    }
+
+    // Oyunu yeniden başlat
+    function restartGame() {
+      health = 100;
+      ammo = 30;
+      score = 0;
+      time = 0;
+      wave = 1;
+      zombiesKilled = 0;
+      player.x = canvas.width / 2;
+      player.y = canvas.height / 2;
+      bullets = [];
+      zombies = [];
+      bloodEffects = [];
+      ammoBoxes = [];
+      healthPacks = [];
+      document.getElementById('gameOver').style.display = 'none';
+      startCountdown();
+    }
+
+    // Geri sayım
+    function startCountdown() {
+      const countdown = document.getElementById('countdown');
+      countdown.style.display = 'block';
+      
+      let count = 3;
+      const countInterval = setInterval(() => {
+        countdown.textContent = count;
+        if (count <= 0) {
+          clearInterval(countInterval);
+          countdown.style.display = 'none';
+          gameRunning = true;
+          gameStarted = true;
+        }
+        count--;
+      }, 1000);
+    }
+
+    // Ana sayfaya dön
+    function goBack() {
+      window.location.href = '../index.html';
+    }
+
+    // Oyunu başlat
+    startCountdown();
+    gameLoop();
+
+    // İstatistikleri güncelle
+    setInterval(updateStats, 100);
+  </script>
+</body>
+</html>

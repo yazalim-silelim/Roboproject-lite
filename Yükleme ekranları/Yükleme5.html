@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Strateji Krallığı - Yükleniyor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #2d1810 0%, #4a2c1a 25%, #6b4423 50%, #8b5a2b 75%, #a67c52 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .loading-container {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .game-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ffd700, #ffb347, #ff8c00);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .loading-bar {
+      width: 400px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 2rem auto;
+      position: relative;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .loading-progress {
+      height: 100%;
+      background: linear-gradient(45deg, #ffd700, #ffb347, #ff8c00);
+      border-radius: 4px;
+      width: 0%;
+      animation: loading 3s ease-in-out infinite;
+      position: relative;
+    }
+
+    .loading-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loading {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .loading-text {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1rem;
+    }
+
+    .loading-percentage {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffd700;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .kingdom-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+
+    .castle {
+      position: absolute;
+      width: 120px;
+      height: 80px;
+      background: linear-gradient(45deg, #8b4513, #a0522d);
+      border-radius: 10px 10px 0 0;
+      top: 20%;
+      left: 10%;
+      animation: castleGlow 3s ease-in-out infinite;
+    }
+
+    .castle::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 20px solid #8b4513;
+    }
+
+    .castle::after {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      width: 20px;
+      height: 20px;
+      background: #ffd700;
+      border-radius: 50%;
+      animation: windowGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes castleGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(139, 69, 19, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(139, 69, 19, 0.8); }
+    }
+
+    @keyframes windowGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+    }
+
+    .flag {
+      position: absolute;
+      width: 30px;
+      height: 20px;
+      background: linear-gradient(45deg, #ff0000, #ff6b6b);
+      border-radius: 0 10px 10px 0;
+      top: 15%;
+      right: 20%;
+      animation: flagWave 2s ease-in-out infinite;
+    }
+
+    .flag::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 0;
+      width: 5px;
+      height: 100%;
+      background: #8b4513;
+    }
+
+    @keyframes flagWave {
+      0%, 100% { transform: rotateY(0deg); }
+      50% { transform: rotateY(15deg); }
+    }
+
+    .knight {
+      position: absolute;
+      width: 40px;
+      height: 60px;
+      background: linear-gradient(45deg, #696969, #808080);
+      border-radius: 20px 20px 0 0;
+      bottom: 20%;
+      right: 15%;
+      animation: knightWalk 4s ease-in-out infinite;
+    }
+
+    .knight::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: #ffd700;
+      border-radius: 50%;
+    }
+
+    .knight::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 20px;
+      background: #8b4513;
+      border-radius: 4px;
+    }
+
+    @keyframes knightWalk {
+      0%, 100% { transform: translateX(0px) translateY(0px); }
+      25% { transform: translateX(-10px) translateY(-5px); }
+      50% { transform: translateX(-20px) translateY(0px); }
+      75% { transform: translateX(-10px) translateY(-5px); }
+    }
+
+    .start-button {
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #ffd700, #ffb347);
+      color: #2d1810;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in-out 3s forwards;
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    }
+
+    .start-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.5);
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .loading-tips {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .crown {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+      animation: crownFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes crownFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0px); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="kingdom-elements">
+    <div class="crown">👑</div>
+    <div class="castle"></div>
+    <div class="flag"></div>
+    <div class="knight"></div>
+  </div>
+
+  <div class="loading-container">
+    <h1 class="game-title">🏰 Strateji Krallığı</h1>
+    <div class="loading-text">Krallığınız kuruluyor...</div>
+    <div class="loading-percentage" id="percentage">0%</div>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+    <button class="start-button" onclick="startGame()">KRALLIĞA GİR</button>
+    
+    <div class="loading-tips">
+      <p>💡 İpucu: Kaynaklarınızı akıllıca yönetin!</p>
+      <p>💡 İpucu: Ordunuzu güçlendirerek düşmanları yenin!</p>
+      <p>💡 İpucu: Diplomasi ile müttefikler kazanın!</p>
+    </div>
+  </div>
+
+  <script>
+    let progress = 0;
+    const percentageElement = document.getElementById('percentage');
+    
+    const loadingInterval = setInterval(() => {
+      progress += Math.random() * 12;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(loadingInterval);
+      }
+      percentageElement.textContent = Math.floor(progress) + '%';
+    }, 200);
+
+    function startGame() {
+      // Oyun başlatma animasyonu
+      document.body.style.animation = 'fadeOut 0.5s ease-in-out forwards';
+      setTimeout(() => {
+        window.location.href = '../Oyunlar/strateji-kralligi.html';
+      }, 500);
+    }
+
+    // Sayfa yüklendiğinde otomatik başlat
+    setTimeout(() => {
+      if (progress >= 100) {
+        document.querySelector('.start-button').style.animation = 'pulse 1s ease-in-out infinite';
+      }
+    }, 3000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pist Macerası - RoboProject Lite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #2d5016 0%, #4a7c59 25%, #6b8e23 50%, #8fbc8f 75%, #98fb98 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-bottom: 1px solid rgba(34, 139, 34, 0.3);
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #32cd32, #228b22);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-stats {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #32cd32;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .game-canvas {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 80px);
+      background: linear-gradient(to bottom, #87ceeb 0%, #98fb98 50%, #228b22 100%);
+    }
+
+    .game-over {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: 20px;
+      text-align: center;
+      border: 1px solid rgba(34, 139, 34, 0.3);
+      display: none;
+      z-index: 200;
+    }
+
+    .game-over h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #32cd32, #228b22);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-over p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .restart-button {
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #32cd32, #228b22);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .restart-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(34, 139, 34, 0.3);
+    }
+
+    .back-button {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .instructions {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(34, 139, 34, 0.3);
+      max-width: 250px;
+      z-index: 150;
+    }
+
+    .instructions h3 {
+      color: #32cd32;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .instructions ul {
+      list-style: none;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    .instructions li::before {
+      content: '🌲 ';
+      margin-right: 0.5rem;
+    }
+
+    .countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8rem;
+      font-weight: 800;
+      color: #32cd32;
+      text-shadow: 0 0 30px rgba(34, 139, 34, 0.5);
+      z-index: 300;
+      display: none;
+    }
+
+    .finish-line {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: #ffd700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+      z-index: 300;
+      display: none;
+    }
+
+    .compass {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      border: 2px solid rgba(34, 139, 34, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 150;
+    }
+
+    .compass::after {
+      content: '🧭';
+      font-size: 1.5rem;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-header">
+    <h1 class="game-title">🌲 Pist Macerası</h1>
+    <div class="game-stats">
+      <div class="stat">
+        <div class="stat-value" id="speed">0</div>
+        <div class="stat-label">Hız (km/h)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="distance">0</div>
+        <div class="stat-label">Mesafe (m)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="time">0</div>
+        <div class="stat-label">Süre (s)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="score">0</div>
+        <div class="stat-label">Puan</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="back-button" onclick="goBack()">← Ana Sayfa</button>
+
+  <div class="compass"></div>
+
+  <div class="instructions">
+    <h3>🌲 Kontroller</h3>
+    <ul>
+      <li>WASD veya Ok tuşları ile hareket</li>
+      <li>Boşluk tuşu ile zıplama</li>
+      <li>Hedefleri topla</li>
+      <li>Engellerden kaç</li>
+    </ul>
+  </div>
+
+  <canvas class="game-canvas" id="gameCanvas"></canvas>
+
+  <div class="countdown" id="countdown">3</div>
+  <div class="finish-line" id="finishLine">🏁</div>
+
+  <div class="game-over" id="gameOver">
+    <h2>Macera Bitti!</h2>
+    <p>Süreniz: <span id="finalTime">0</span> saniye</p>
+    <p>Mesafe: <span id="finalDistance">0</span> metre</p>
+    <p>Puanınız: <span id="finalScore">0</span></p>
+    <button class="restart-button" onclick="restartGame()">Tekrar Macera</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Canvas boyutlarını ayarla
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 80;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Oyun değişkenleri
+    let gameRunning = false;
+    let gameStarted = false;
+    let speed = 0;
+    let distance = 0;
+    let time = 0;
+    let score = 0;
+    let jumpActive = false;
+    let jumpVelocity = 0;
+    let gravity = 0.8;
+
+    // Oyuncu macera aracı
+    const player = {
+      x: canvas.width / 2,
+      y: canvas.height - 120,
+      width: 70,
+      height: 110,
+      speed: 0,
+      maxSpeed: 220,
+      acceleration: 3,
+      deceleration: 1.5,
+      turnSpeed: 4,
+      onGround: true
+    };
+
+    // Yol çizgileri ve engeller
+    let roadLines = [];
+    let obstacles = [];
+    let collectibles = [];
+    let trees = [];
+    let particles = [];
+
+    // Tuş durumları
+    const keys = {};
+
+    // Tuş olayları
+    document.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      if (e.code === 'Space' && player.onGround) {
+        e.preventDefault();
+        jumpActive = true;
+        jumpVelocity = -15;
+        player.onGround = false;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    // Yol çizgilerini oluştur
+    function createRoadLines() {
+      roadLines = [];
+      for (let i = 0; i < 30; i++) {
+        roadLines.push({
+          x: canvas.width / 2 - 2,
+          y: -100 + i * 70,
+          width: 4,
+          height: 45,
+          speed: 6
+        });
+      }
+    }
+
+    // Ağaçları oluştur
+    function createTrees() {
+      if (Math.random() < 0.02) {
+        trees.push({
+          x: Math.random() < 0.5 ? -50 : canvas.width + 50,
+          y: -100,
+          width: 60,
+          height: 120,
+          speed: 6,
+          side: Math.random() < 0.5 ? 'left' : 'right'
+        });
+      }
+    }
+
+    // Engelleri oluştur
+    function createObstacles() {
+      if (Math.random() < 0.025) {
+        obstacles.push({
+          x: Math.random() * (canvas.width - 80),
+          y: -100,
+          width: 80,
+          height: 40,
+          speed: 6,
+          type: Math.random() < 0.5 ? 'rock' : 'log'
+        });
+      }
+    }
+
+    // Toplanabilir nesneleri oluştur
+    function createCollectibles() {
+      if (Math.random() < 0.02) {
+        collectibles.push({
+          x: Math.random() * (canvas.width - 30),
+          y: -100,
+          width: 30,
+          height: 30,
+          speed: 6,
+          type: Math.random() < 0.4 ? 'coin' : Math.random() < 0.5 ? 'gem' : 'star'
+        });
+      }
+    }
+
+    // Parçacık sistemi
+    function createParticles(x, y, count, color) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          life: 1,
+          decay: 0.015,
+          color: color,
+          size: Math.random() * 4 + 2
+        });
+      }
+    }
+
+    // Çarpışma kontrolü
+    function checkCollision(rect1, rect2) {
+      return rect1.x < rect2.x + rect2.width &&
+             rect1.x + rect1.width > rect2.x &&
+             rect1.y < rect2.y + rect2.height &&
+             rect1.y + rect1.height > rect2.y;
+    }
+
+    // Oyun güncelleme
+    function update() {
+      if (!gameRunning) return;
+
+      // Zaman güncelle
+      time += 1/60;
+
+      // Hız güncelle
+      if (keys['w'] || keys['arrowup']) {
+        player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
+      } else if (keys['s'] || keys['arrowdown']) {
+        player.speed = Math.max(player.speed - player.acceleration, 0);
+      } else {
+        player.speed = Math.max(player.speed - player.deceleration, 0);
+      }
+
+      // Zıplama fiziği
+      if (jumpActive) {
+        player.y += jumpVelocity;
+        jumpVelocity += gravity;
+        
+        if (player.y >= canvas.height - 120) {
+          player.y = canvas.height - 120;
+          jumpActive = false;
+          player.onGround = true;
+          jumpVelocity = 0;
+        }
+      }
+
+      // Araba hareketi
+      if (keys['a'] || keys['arrowleft']) {
+        player.x = Math.max(0, player.x - player.turnSpeed);
+      }
+      if (keys['d'] || keys['arrowright']) {
+        player.x = Math.min(canvas.width - player.width, player.x + player.turnSpeed);
+      }
+
+      // Mesafe güncelle
+      distance += player.speed * 0.12;
+
+      // Yol çizgilerini güncelle
+      roadLines.forEach(line => {
+        line.y += line.speed;
+        if (line.y > canvas.height) {
+          line.y = -100;
+        }
+      });
+
+      // Ağaçları güncelle
+      trees.forEach((tree, index) => {
+        tree.y += tree.speed;
+        if (tree.y > canvas.height) {
+          trees.splice(index, 1);
+        }
+      });
+
+      // Engelleri güncelle
+      obstacles.forEach((obstacle, index) => {
+        obstacle.y += obstacle.speed;
+        if (obstacle.y > canvas.height) {
+          obstacles.splice(index, 1);
+        }
+      });
+
+      // Toplanabilir nesneleri güncelle
+      collectibles.forEach((collectible, index) => {
+        collectible.y += collectible.speed;
+        if (collectible.y > canvas.height) {
+          collectibles.splice(index, 1);
+        }
+      });
+
+      // Parçacıkları güncelle
+      particles.forEach((particle, index) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life -= particle.decay;
+        if (particle.life <= 0) {
+          particles.splice(index, 1);
+        }
+      });
+
+      // Çarpışma kontrolü
+      obstacles.forEach((obstacle, index) => {
+        if (checkCollision(player, obstacle)) {
+          gameOver();
+        }
+      });
+
+      // Toplanabilir nesneleri toplama
+      collectibles.forEach((collectible, index) => {
+        if (checkCollision(player, collectible)) {
+          if (collectible.type === 'coin') {
+            score += 10;
+            createParticles(collectible.x, collectible.y, 8, '#ffd700');
+          } else if (collectible.type === 'gem') {
+            score += 25;
+            createParticles(collectible.x, collectible.y, 12, '#00ffff');
+          } else if (collectible.type === 'star') {
+            score += 50;
+            createParticles(collectible.x, collectible.y, 15, '#ffff00');
+          }
+          collectibles.splice(index, 1);
+        }
+      });
+
+      // Yeni nesneler oluştur
+      createTrees();
+      createObstacles();
+      createCollectibles();
+
+      // Bitiş kontrolü
+      if (distance >= 2500) {
+        finishAdventure();
+      }
+    }
+
+    // Çizim
+    function draw() {
+      // Arka planı temizle
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Yol çizgileri
+      ctx.fillStyle = '#ffffff';
+      roadLines.forEach(line => {
+        ctx.fillRect(line.x, line.y, line.width, line.height);
+      });
+
+      // Yol kenarları
+      ctx.fillStyle = '#8b4513';
+      ctx.fillRect(0, 0, 120, canvas.height);
+      ctx.fillRect(canvas.width - 120, 0, 120, canvas.height);
+
+      // Ağaçlar
+      trees.forEach(tree => {
+        ctx.fillStyle = '#228b22';
+        ctx.fillRect(tree.x, tree.y, tree.width, tree.height);
+        // Ağaç gövdesi
+        ctx.fillStyle = '#8b4513';
+        ctx.fillRect(tree.x + 20, tree.y + 80, 20, 40);
+      });
+
+      // Engeller
+      obstacles.forEach(obstacle => {
+        if (obstacle.type === 'rock') {
+          ctx.fillStyle = '#696969';
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        } else {
+          ctx.fillStyle = '#8b4513';
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        }
+      });
+
+      // Toplanabilir nesneler
+      collectibles.forEach(collectible => {
+        if (collectible.type === 'coin') {
+          ctx.fillStyle = '#ffd700';
+          ctx.fillRect(collectible.x, collectible.y, collectible.width, collectible.height);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('₿', collectible.x + 10, collectible.y + 20);
+        } else if (collectible.type === 'gem') {
+          ctx.fillStyle = '#00ffff';
+          ctx.fillRect(collectible.x, collectible.y, collectible.width, collectible.height);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('💎', collectible.x + 5, collectible.y + 20);
+        } else {
+          ctx.fillStyle = '#ffff00';
+          ctx.fillRect(collectible.x, collectible.y, collectible.width, collectible.height);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('⭐', collectible.x + 5, collectible.y + 20);
+        }
+      });
+
+      // Parçacıklar
+      particles.forEach(particle => {
+        ctx.globalAlpha = particle.life;
+        ctx.fillStyle = particle.color;
+        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+      });
+      ctx.globalAlpha = 1;
+
+      // Oyuncu macera aracı - Detaylı modelleme
+      // Ana gövde (SUV tarzı)
+      ctx.fillStyle = '#32cd32';
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      // Araba gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(player.x + 8, player.y + player.height - 8, player.width - 16, 12);
+      
+      // Kaporta (ana kısım) - yüksek ve güçlü
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 10, player.y + 25, player.width - 20, 30);
+      
+      // Ön cam (büyük ve geniş)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 15, player.y + 28, player.width - 30, 20);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 17, player.y + 30, player.width - 34, 16);
+      
+      // Yan camlar (büyük ve geniş)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 12, player.y + 32, 12, 20);
+      ctx.fillRect(player.x + player.width - 24, player.y + 32, 12, 20);
+      
+      // Kapılar (büyük)
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 15, player.y + 38, 18, 40);
+      ctx.fillRect(player.x + player.width - 33, player.y + 38, 18, 40);
+      
+      // Arka cam (büyük)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 15, player.y + 55, player.width - 30, 18);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 17, player.y + 57, player.width - 34, 14);
+      
+      // Bagaj (büyük ve güçlü)
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 10, player.y + 75, player.width - 20, 25);
+      
+      // Ön ızgara (büyük ve güçlü)
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 18, player.y + 20, player.width - 36, 12);
+      
+      // Farlar (büyük ve güçlü)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(player.x + 15, player.y + 18, 10, 10);
+      ctx.fillRect(player.x + player.width - 25, player.y + 18, 10, 10);
+      ctx.fillStyle = '#ffff00';
+      ctx.fillRect(player.x + 17, player.y + 20, 6, 6);
+      ctx.fillRect(player.x + player.width - 23, player.y + 20, 6, 6);
+      
+      // Arka farlar (büyük)
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(player.x + 15, player.y + player.height - 25, 10, 10);
+      ctx.fillRect(player.x + player.width - 25, player.y + player.height - 25, 10, 10);
+      
+      // Tekerlekler - SUV tarzı (büyük ve güçlü)
+      ctx.fillStyle = '#000000';
+      // Ön tekerlekler (büyük)
+      ctx.fillRect(player.x + 8, player.y + 8, 18, 24);
+      ctx.fillRect(player.x + player.width - 26, player.y + 8, 18, 24);
+      // Arka tekerlekler (daha büyük)
+      ctx.fillRect(player.x + 8, player.y + player.height - 32, 18, 24);
+      ctx.fillRect(player.x + player.width - 26, player.y + player.height - 32, 18, 24);
+      
+      // Tekerlek jantları (güçlü)
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(player.x + 10, player.y + 10, 14, 20);
+      ctx.fillRect(player.x + player.width - 24, player.y + 10, 14, 20);
+      ctx.fillRect(player.x + 10, player.y + player.height - 30, 14, 20);
+      ctx.fillRect(player.x + player.width - 24, player.y + player.height - 30, 14, 20);
+      
+      // Tekerlek merkezleri (logo tarzı)
+      ctx.fillStyle = '#32cd32';
+      ctx.fillRect(player.x + 12, player.y + 12, 10, 16);
+      ctx.fillRect(player.x + player.width - 22, player.y + 12, 10, 16);
+      ctx.fillRect(player.x + 12, player.y + player.height - 28, 10, 16);
+      ctx.fillRect(player.x + player.width - 22, player.y + player.height - 28, 10, 16);
+      
+      // Çamurluklar
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 5, player.y + 15, 4, 60);
+      ctx.fillRect(player.x + player.width - 9, player.y + 15, 4, 60);
+      
+      // Yan etekler
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 10, player.y + 45, 4, 55);
+      ctx.fillRect(player.x + player.width - 14, player.y + 45, 4, 55);
+      
+      // Tavan bagajı
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 15, player.y + 15, player.width - 30, 8);
+    }
+
+    // Oyun döngüsü
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // İstatistikleri güncelle
+    function updateStats() {
+      document.getElementById('speed').textContent = Math.floor(player.speed);
+      document.getElementById('distance').textContent = Math.floor(distance);
+      document.getElementById('time').textContent = Math.floor(time);
+      document.getElementById('score').textContent = score;
+    }
+
+    // Oyun bitişi
+    function gameOver() {
+      gameRunning = false;
+      document.getElementById('finalTime').textContent = Math.floor(time);
+      document.getElementById('finalDistance').textContent = Math.floor(distance);
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('gameOver').style.display = 'block';
+    }
+
+    // Macera bitişi
+    function finishAdventure() {
+      gameRunning = false;
+      document.getElementById('finishLine').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('finishLine').style.display = 'none';
+        document.getElementById('finalTime').textContent = Math.floor(time);
+        document.getElementById('finalDistance').textContent = Math.floor(distance);
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('gameOver').style.display = 'block';
+      }, 2000);
+    }
+
+    // Oyunu yeniden başlat
+    function restartGame() {
+      speed = 0;
+      distance = 0;
+      time = 0;
+      score = 0;
+      jumpActive = false;
+      jumpVelocity = 0;
+      player.x = canvas.width / 2;
+      player.y = canvas.height - 120;
+      player.speed = 0;
+      obstacles = [];
+      collectibles = [];
+      trees = [];
+      particles = [];
+      createRoadLines();
+      document.getElementById('gameOver').style.display = 'none';
+      document.getElementById('finishLine').style.display = 'none';
+      startCountdown();
+    }
+
+    // Geri sayım
+    function startCountdown() {
+      const countdown = document.getElementById('countdown');
+      countdown.style.display = 'block';
+      
+      let count = 3;
+      const countInterval = setInterval(() => {
+        countdown.textContent = count;
+        if (count <= 0) {
+          clearInterval(countInterval);
+          countdown.style.display = 'none';
+          gameRunning = true;
+          gameStarted = true;
+        }
+        count--;
+      }, 1000);
+    }
+
+    // Ana sayfaya dön
+    function goBack() {
+      window.location.href = '../index.html';
+    }
+
+    // Oyunu başlat
+    createRoadLines();
+    startCountdown();
+    gameLoop();
+
+    // İstatistikleri güncelle
+    setInterval(updateStats, 100);
+  </script>
+</body>
+</html>
