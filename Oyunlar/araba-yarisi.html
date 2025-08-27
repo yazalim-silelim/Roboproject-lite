@@ -275,9 +275,9 @@
       width: 60,
       height: 100,
       speed: 0,
-      maxSpeed: 200,
-      acceleration: 2,
-      deceleration: 1,
+      maxSpeed: 250,
+      acceleration: 2.5,
+      deceleration: 1.2,
       turnSpeed: 3
     };
 
@@ -439,7 +439,7 @@
       }
 
       // Bitiş kontrolü
-      if (distance >= 1000) {
+      if (distance >= 3000) {
         finishRace();
       }
     }
@@ -481,22 +481,81 @@
         }
       });
 
-      // Oyuncu araba
+      // Oyuncu araba - Detaylı modelleme
+      // Ana gövde
       ctx.fillStyle = '#ff6b6b';
       ctx.fillRect(player.x, player.y, player.width, player.height);
       
-      // Araba detayları
-      ctx.fillStyle = '#ffd700';
-      ctx.fillRect(player.x + 10, player.y + 15, 40, 20);
+      // Araba gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(player.x + 5, player.y + player.height - 5, player.width - 10, 10);
+      
+      // Kaporta (ana kısım)
+      ctx.fillStyle = '#ff8e8e';
+      ctx.fillRect(player.x + 8, player.y + 15, player.width - 16, 25);
+      
+      // Ön cam
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 12, player.y + 18, player.width - 24, 18);
       ctx.fillStyle = '#000000';
-      ctx.fillRect(player.x + 15, player.y + 20, 30, 10);
-
-      // Tekerlekler
+      ctx.fillRect(player.x + 14, player.y + 20, player.width - 28, 14);
+      
+      // Yan camlar
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 8, player.y + 25, 8, 15);
+      ctx.fillRect(player.x + player.width - 16, player.y + 25, 8, 15);
+      
+      // Kapılar
+      ctx.fillStyle = '#ff6b6b';
+      ctx.fillRect(player.x + 10, player.y + 30, 12, 35);
+      ctx.fillRect(player.x + player.width - 22, player.y + 30, 12, 35);
+      
+      // Arka cam
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 12, player.y + 45, player.width - 24, 15);
       ctx.fillStyle = '#000000';
-      ctx.fillRect(player.x + 5, player.y + 5, 10, 15);
-      ctx.fillRect(player.x + player.width - 15, player.y + 5, 10, 15);
-      ctx.fillRect(player.x + 5, player.y + player.height - 20, 10, 15);
-      ctx.fillRect(player.x + player.width - 15, player.y + player.height - 20, 10, 15);
+      ctx.fillRect(player.x + 14, player.y + 47, player.width - 28, 11);
+      
+      // Bagaj
+      ctx.fillStyle = '#ff8e8e';
+      ctx.fillRect(player.x + 8, player.y + 60, player.width - 16, 20);
+      
+      // Ön ızgara
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 15, player.y + 10, player.width - 30, 8);
+      
+      // Farlar
+      ctx.fillStyle = '#ffff00';
+      ctx.fillRect(player.x + 8, player.y + 8, 6, 6);
+      ctx.fillRect(player.x + player.width - 14, player.y + 8, 6, 6);
+      
+      // Arka farlar
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(player.x + 8, player.y + player.height - 14, 6, 6);
+      ctx.fillRect(player.x + player.width - 14, player.y + player.height - 14, 6, 6);
+      
+      // Tekerlekler - Detaylı
+      ctx.fillStyle = '#000000';
+      // Ön tekerlekler
+      ctx.fillRect(player.x + 5, player.y + 5, 12, 18);
+      ctx.fillRect(player.x + player.width - 17, player.y + 5, 12, 18);
+      // Arka tekerlekler
+      ctx.fillRect(player.x + 5, player.y + player.height - 23, 12, 18);
+      ctx.fillRect(player.x + player.width - 17, player.y + player.height - 23, 12, 18);
+      
+      // Tekerlek jantları
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(player.x + 7, player.y + 7, 8, 14);
+      ctx.fillRect(player.x + player.width - 15, player.y + 7, 8, 14);
+      ctx.fillRect(player.x + 7, player.y + player.height - 21, 8, 14);
+      ctx.fillRect(player.x + player.width - 15, player.y + player.height - 21, 8, 14);
+      
+      // Tekerlek merkezleri
+      ctx.fillStyle = '#666666';
+      ctx.fillRect(player.x + 9, player.y + 9, 4, 10);
+      ctx.fillRect(player.x + player.width - 13, player.y + 9, 4, 10);
+      ctx.fillRect(player.x + 9, player.y + player.height - 19, 4, 10);
+      ctx.fillRect(player.x + player.width - 13, player.y + player.height - 19, 4, 10);
 
       // Nitro bar
       ctx.fillStyle = '#333333';

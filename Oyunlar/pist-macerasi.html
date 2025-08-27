@@ -310,10 +310,10 @@
       width: 70,
       height: 110,
       speed: 0,
-      maxSpeed: 180,
-      acceleration: 2.5,
-      deceleration: 1.2,
-      turnSpeed: 3,
+      maxSpeed: 220,
+      acceleration: 3,
+      deceleration: 1.5,
+      turnSpeed: 4,
       onGround: true
     };
 
@@ -534,7 +534,7 @@
       createCollectibles();
 
       // Bitiş kontrolü
-      if (distance >= 1500) {
+      if (distance >= 2500) {
         finishAdventure();
       }
     }
@@ -603,22 +603,98 @@
       });
       ctx.globalAlpha = 1;
 
-      // Oyuncu macera aracı
+      // Oyuncu macera aracı - Detaylı modelleme
+      // Ana gövde (SUV tarzı)
       ctx.fillStyle = '#32cd32';
       ctx.fillRect(player.x, player.y, player.width, player.height);
       
-      // Araba detayları
+      // Araba gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillRect(player.x + 8, player.y + player.height - 8, player.width - 16, 12);
+      
+      // Kaporta (ana kısım) - yüksek ve güçlü
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 10, player.y + 25, player.width - 20, 30);
+      
+      // Ön cam (büyük ve geniş)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 15, player.y + 28, player.width - 30, 20);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 17, player.y + 30, player.width - 34, 16);
+      
+      // Yan camlar (büyük ve geniş)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 12, player.y + 32, 12, 20);
+      ctx.fillRect(player.x + player.width - 24, player.y + 32, 12, 20);
+      
+      // Kapılar (büyük)
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 15, player.y + 38, 18, 40);
+      ctx.fillRect(player.x + player.width - 33, player.y + 38, 18, 40);
+      
+      // Arka cam (büyük)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 15, player.y + 55, player.width - 30, 18);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 17, player.y + 57, player.width - 34, 14);
+      
+      // Bagaj (büyük ve güçlü)
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 10, player.y + 75, player.width - 20, 25);
+      
+      // Ön ızgara (büyük ve güçlü)
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 18, player.y + 20, player.width - 36, 12);
+      
+      // Farlar (büyük ve güçlü)
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(player.x + 15, player.y + 20, 40, 25);
+      ctx.fillRect(player.x + 15, player.y + 18, 10, 10);
+      ctx.fillRect(player.x + player.width - 25, player.y + 18, 10, 10);
+      ctx.fillStyle = '#ffff00';
+      ctx.fillRect(player.x + 17, player.y + 20, 6, 6);
+      ctx.fillRect(player.x + player.width - 23, player.y + 20, 6, 6);
+      
+      // Arka farlar (büyük)
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(player.x + 15, player.y + player.height - 25, 10, 10);
+      ctx.fillRect(player.x + player.width - 25, player.y + player.height - 25, 10, 10);
+      
+      // Tekerlekler - SUV tarzı (büyük ve güçlü)
       ctx.fillStyle = '#000000';
-      ctx.fillRect(player.x + 20, player.y + 25, 30, 15);
-
-      // Tekerlekler
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(player.x + 10, player.y + 5, 15, 20);
-      ctx.fillRect(player.x + player.width - 25, player.y + 5, 15, 20);
-      ctx.fillRect(player.x + 10, player.y + player.height - 25, 15, 20);
-      ctx.fillRect(player.x + player.width - 25, player.y + player.height - 25, 15, 20);
+      // Ön tekerlekler (büyük)
+      ctx.fillRect(player.x + 8, player.y + 8, 18, 24);
+      ctx.fillRect(player.x + player.width - 26, player.y + 8, 18, 24);
+      // Arka tekerlekler (daha büyük)
+      ctx.fillRect(player.x + 8, player.y + player.height - 32, 18, 24);
+      ctx.fillRect(player.x + player.width - 26, player.y + player.height - 32, 18, 24);
+      
+      // Tekerlek jantları (güçlü)
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(player.x + 10, player.y + 10, 14, 20);
+      ctx.fillRect(player.x + player.width - 24, player.y + 10, 14, 20);
+      ctx.fillRect(player.x + 10, player.y + player.height - 30, 14, 20);
+      ctx.fillRect(player.x + player.width - 24, player.y + player.height - 30, 14, 20);
+      
+      // Tekerlek merkezleri (logo tarzı)
+      ctx.fillStyle = '#32cd32';
+      ctx.fillRect(player.x + 12, player.y + 12, 10, 16);
+      ctx.fillRect(player.x + player.width - 22, player.y + 12, 10, 16);
+      ctx.fillRect(player.x + 12, player.y + player.height - 28, 10, 16);
+      ctx.fillRect(player.x + player.width - 22, player.y + player.height - 28, 10, 16);
+      
+      // Çamurluklar
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 5, player.y + 15, 4, 60);
+      ctx.fillRect(player.x + player.width - 9, player.y + 15, 4, 60);
+      
+      // Yan etekler
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 10, player.y + 45, 4, 55);
+      ctx.fillRect(player.x + player.width - 14, player.y + 45, 4, 55);
+      
+      // Tavan bagajı
+      ctx.fillStyle = '#228b22';
+      ctx.fillRect(player.x + 15, player.y + 15, player.width - 30, 8);
     }
 
     // Oyun döngüsü

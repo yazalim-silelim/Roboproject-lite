@@ -306,11 +306,11 @@
       width: 80,
       height: 120,
       speed: 0,
-      maxSpeed: 300,
-      acceleration: 3,
-      deceleration: 1.5,
-      turnSpeed: 4,
-      driftFactor: 1.5
+      maxSpeed: 400,
+      acceleration: 4,
+      deceleration: 2,
+      turnSpeed: 5,
+      driftFactor: 1.8
     };
 
     // Yol çizgileri ve engeller
@@ -521,7 +521,7 @@
       }
 
       // Bitiş kontrolü
-      if (distance >= 2000) {
+      if (distance >= 5000) {
         finishRace();
       }
     }
@@ -576,22 +576,98 @@
       });
       ctx.globalAlpha = 1;
 
-      // Oyuncu süper araba
+      // Oyuncu süper araba - Detaylı modelleme
+      // Ana gövde (aerodinamik)
       ctx.fillStyle = '#00ffff';
       ctx.fillRect(player.x, player.y, player.width, player.height);
       
-      // Araba detayları
+      // Araba gölgesi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.fillRect(player.x + 8, player.y + player.height - 8, player.width - 16, 12);
+      
+      // Kaporta (ana kısım) - daha aerodinamik
+      ctx.fillStyle = '#00e6e6';
+      ctx.fillRect(player.x + 10, player.y + 20, player.width - 20, 30);
+      
+      // Ön cam (büyük ve aerodinamik)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 15, player.y + 22, player.width - 30, 22);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 17, player.y + 24, player.width - 34, 18);
+      
+      // Yan camlar (küçük ve sportif)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 12, player.y + 28, 10, 18);
+      ctx.fillRect(player.x + player.width - 22, player.y + 28, 10, 18);
+      
+      // Kapılar (sportif)
+      ctx.fillStyle = '#00e6e6';
+      ctx.fillRect(player.x + 15, player.y + 35, 15, 40);
+      ctx.fillRect(player.x + player.width - 30, player.y + 35, 15, 40);
+      
+      // Arka cam (küçük ve sportif)
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(player.x + 15, player.y + 50, player.width - 30, 18);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 17, player.y + 52, player.width - 34, 14);
+      
+      // Bagaj (aerodinamik)
+      ctx.fillStyle = '#00e6e6';
+      ctx.fillRect(player.x + 10, player.y + 70, player.width - 20, 25);
+      
+      // Ön ızgara (büyük ve agresif)
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 20, player.y + 15, player.width - 40, 10);
+      
+      // Farlar (LED tarzı)
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(player.x + 15, player.y + 20, 50, 30);
+      ctx.fillRect(player.x + 12, player.y + 12, 8, 8);
+      ctx.fillRect(player.x + player.width - 20, player.y + 12, 8, 8);
+      ctx.fillStyle = '#00ffff';
+      ctx.fillRect(player.x + 14, player.y + 14, 4, 4);
+      ctx.fillRect(player.x + player.width - 18, player.y + 14, 4, 4);
+      
+      // Arka farlar (LED tarzı)
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(player.x + 12, player.y + player.height - 20, 8, 8);
+      ctx.fillRect(player.x + player.width - 20, player.y + player.height - 20, 8, 8);
+      
+      // Egzoz boruları
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 15, player.y + player.height - 15, 6, 12);
+      ctx.fillRect(player.x + player.width - 21, player.y + player.height - 15, 6, 12);
+      
+      // Tekerlekler - Süper araba tarzı
       ctx.fillStyle = '#000000';
-      ctx.fillRect(player.x + 20, player.y + 25, 40, 20);
-
-      // Tekerlekler
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(player.x + 10, player.y + 10, 15, 20);
-      ctx.fillRect(player.x + player.width - 25, player.y + 10, 15, 20);
-      ctx.fillRect(player.x + 10, player.y + player.height - 30, 15, 20);
-      ctx.fillRect(player.x + player.width - 25, player.y + player.height - 30, 15, 20);
+      // Ön tekerlekler (büyük)
+      ctx.fillRect(player.x + 8, player.y + 8, 16, 22);
+      ctx.fillRect(player.x + player.width - 24, player.y + 8, 16, 22);
+      // Arka tekerlekler (daha büyük)
+      ctx.fillRect(player.x + 8, player.y + player.height - 30, 16, 22);
+      ctx.fillRect(player.x + player.width - 24, player.y + player.height - 30, 16, 22);
+      
+      // Tekerlek jantları (sportif)
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(player.x + 10, player.y + 10, 12, 18);
+      ctx.fillRect(player.x + player.width - 22, player.y + 10, 12, 18);
+      ctx.fillRect(player.x + 10, player.y + player.height - 28, 12, 18);
+      ctx.fillRect(player.x + player.width - 22, player.y + player.height - 28, 12, 18);
+      
+      // Tekerlek merkezleri (logo tarzı)
+      ctx.fillStyle = '#00ffff';
+      ctx.fillRect(player.x + 12, player.y + 12, 8, 14);
+      ctx.fillRect(player.x + player.width - 20, player.y + 12, 8, 14);
+      ctx.fillRect(player.x + 12, player.y + player.height - 26, 8, 14);
+      ctx.fillRect(player.x + player.width - 20, player.y + player.height - 26, 8, 14);
+      
+      // Spoiler (arka kanat)
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 15, player.y + 75, player.width - 30, 8);
+      
+      // Yan etekler
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(player.x + 8, player.y + 40, 4, 50);
+      ctx.fillRect(player.x + player.width - 12, player.y + 40, 4, 50);
 
       // Nitro bar güncelle
       document.getElementById('nitroFill').style.width = (nitro / 100) * 200 + 'px';
