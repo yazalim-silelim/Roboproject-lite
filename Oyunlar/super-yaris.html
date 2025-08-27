@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Süper Yarış - RoboProject Lite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #00ffff, #0080ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-stats {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00ffff;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .game-canvas {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 80px);
+      background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    .game-over {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: 20px;
+      text-align: center;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      display: none;
+      z-index: 200;
+    }
+
+    .game-over h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #00ffff, #0080ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-over p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .restart-button {
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #00ffff, #0080ff);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .restart-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .back-button {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .instructions {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      max-width: 250px;
+      z-index: 150;
+    }
+
+    .instructions h3 {
+      color: #00ffff;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .instructions ul {
+      list-style: none;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .instructions li {
+      margin-bottom: 0.5rem;
+    }
+
+    .instructions li::before {
+      content: '🏎️ ';
+      margin-right: 0.5rem;
+    }
+
+    .countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8rem;
+      font-weight: 800;
+      color: #00ffff;
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+      z-index: 300;
+      display: none;
+    }
+
+    .finish-line {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: #ffd700;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+      z-index: 300;
+      display: none;
+    }
+
+    .nitro-gauge {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      width: 200px;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      overflow: hidden;
+      z-index: 150;
+    }
+
+    .nitro-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff0000, #ff8000, #ffff00, #00ff00);
+      width: 100%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-header">
+    <h1 class="game-title">🏎️ Süper Yarış</h1>
+    <div class="game-stats">
+      <div class="stat">
+        <div class="stat-value" id="speed">0</div>
+        <div class="stat-label">Hız (km/h)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="distance">0</div>
+        <div class="stat-label">Mesafe (m)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="time">0</div>
+        <div class="stat-label">Süre (s)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="nitro">100</div>
+        <div class="stat-label">Nitro (%)</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="back-button" onclick="goBack()">← Ana Sayfa</button>
+
+  <div class="nitro-gauge">
+    <div class="nitro-fill" id="nitroFill"></div>
+  </div>
+
+  <div class="instructions">
+    <h3>🏎️ Kontroller</h3>
+    <ul>
+      <li>WASD veya Ok tuşları ile hareket</li>
+      <li>Boşluk tuşu ile nitro boost</li>
+      <li>Shift ile drift</li>
+      <li>Hızlı bitir, puan kazan</li>
+    </ul>
+  </div>
+
+  <canvas class="game-canvas" id="gameCanvas"></canvas>
+
+  <div class="countdown" id="countdown">3</div>
+  <div class="finish-line" id="finishLine">🏁</div>
+
+  <div class="game-over" id="gameOver">
+    <h2>Yarış Bitti!</h2>
+    <p>Süreniz: <span id="finalTime">0</span> saniye</p>
+    <p>Mesafe: <span id="finalDistance">0</span> metre</p>
+    <p>En Yüksek Hız: <span id="maxSpeed">0</span> km/h</p>
+    <button class="restart-button" onclick="restartGame()">Tekrar Yarış</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Canvas boyutlarını ayarla
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 80;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Oyun değişkenleri
+    let gameRunning = false;
+    let gameStarted = false;
+    let speed = 0;
+    let distance = 0;
+    let time = 0;
+    let nitro = 100;
+    let nitroActive = false;
+    let maxSpeed = 0;
+    let driftMode = false;
+
+    // Oyuncu süper araba
+    const player = {
+      x: canvas.width / 2,
+      y: canvas.height - 100,
+      width: 80,
+      height: 120,
+      speed: 0,
+      maxSpeed: 300,
+      acceleration: 3,
+      deceleration: 1.5,
+      turnSpeed: 4,
+      driftFactor: 1.5
+    };
+
+    // Yol çizgileri ve engeller
+    let roadLines = [];
+    let obstacles = [];
+    let powerUps = [];
+    let particles = [];
+
+    // Tuş durumları
+    const keys = {};
+
+    // Tuş olayları
+    document.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      if (e.code === 'Space' && nitro > 0) {
+        e.preventDefault();
+        nitroActive = true;
+      }
+      if (e.key === 'Shift') {
+        driftMode = true;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+      if (e.code === 'Space') {
+        nitroActive = false;
+      }
+      if (e.key === 'Shift') {
+        driftMode = false;
+      }
+    });
+
+    // Yol çizgilerini oluştur
+    function createRoadLines() {
+      roadLines = [];
+      for (let i = 0; i < 25; i++) {
+        roadLines.push({
+          x: canvas.width / 2 - 3,
+          y: -100 + i * 80,
+          width: 6,
+          height: 50,
+          speed: 8
+        });
+      }
+    }
+
+    // Engelleri oluştur
+    function createObstacles() {
+      if (Math.random() < 0.03) {
+        obstacles.push({
+          x: Math.random() * (canvas.width - 80),
+          y: -100,
+          width: 80,
+          height: 80,
+          speed: 8,
+          type: Math.random() < 0.3 ? 'barrier' : 'car'
+        });
+      }
+    }
+
+    // Güçlendiricileri oluştur
+    function createPowerUps() {
+      if (Math.random() < 0.015) {
+        powerUps.push({
+          x: Math.random() * (canvas.width - 40),
+          y: -100,
+          width: 40,
+          height: 40,
+          speed: 8,
+          type: Math.random() < 0.5 ? 'nitro' : 'speed'
+        });
+      }
+    }
+
+    // Parçacık sistemi
+    function createParticles(x, y, count, color) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 0.5) * 10,
+          life: 1,
+          decay: 0.02,
+          color: color,
+          size: Math.random() * 3 + 1
+        });
+      }
+    }
+
+    // Çarpışma kontrolü
+    function checkCollision(rect1, rect2) {
+      return rect1.x < rect2.x + rect2.width &&
+             rect1.x + rect1.width > rect2.x &&
+             rect1.y < rect2.y + rect2.height &&
+             rect1.y + rect1.height > rect2.y;
+    }
+
+    // Oyun güncelleme
+    function update() {
+      if (!gameRunning) return;
+
+      // Zaman güncelle
+      time += 1/60;
+
+      // Hız güncelle
+      if (keys['w'] || keys['arrowup']) {
+        player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
+      } else if (keys['s'] || keys['arrowdown']) {
+        player.speed = Math.max(player.speed - player.acceleration, 0);
+      } else {
+        player.speed = Math.max(player.speed - player.deceleration, 0);
+      }
+
+      // Nitro kullan
+      if (nitroActive && nitro > 0) {
+        player.speed = Math.min(player.speed + 5, player.maxSpeed + 100);
+        nitro -= 3;
+        createParticles(player.x + player.width/2, player.y + player.height, 5, '#00ffff');
+      }
+
+      // Drift modu
+      if (driftMode && player.speed > 50) {
+        player.turnSpeed = player.turnSpeed * player.driftFactor;
+        createParticles(player.x + player.width/2, player.y + player.height, 3, '#ff8000');
+      } else {
+        player.turnSpeed = 4;
+      }
+
+      // Araba hareketi
+      if (keys['a'] || keys['arrowleft']) {
+        player.x = Math.max(0, player.x - player.turnSpeed);
+      }
+      if (keys['d'] || keys['arrowright']) {
+        player.x = Math.min(canvas.width - player.width, player.x + player.turnSpeed);
+      }
+
+      // Mesafe güncelle
+      distance += player.speed * 0.15;
+
+      // En yüksek hızı güncelle
+      if (player.speed > maxSpeed) {
+        maxSpeed = player.speed;
+      }
+
+      // Yol çizgilerini güncelle
+      roadLines.forEach(line => {
+        line.y += line.speed;
+        if (line.y > canvas.height) {
+          line.y = -100;
+        }
+      });
+
+      // Engelleri güncelle
+      obstacles.forEach((obstacle, index) => {
+        obstacle.y += obstacle.speed;
+        if (obstacle.y > canvas.height) {
+          obstacles.splice(index, 1);
+        }
+      });
+
+      // Güçlendiricileri güncelle
+      powerUps.forEach((powerUp, index) => {
+        powerUp.y += powerUp.speed;
+        if (powerUp.y > canvas.height) {
+          powerUps.splice(index, 1);
+        }
+      });
+
+      // Parçacıkları güncelle
+      particles.forEach((particle, index) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life -= particle.decay;
+        if (particle.life <= 0) {
+          particles.splice(index, 1);
+        }
+      });
+
+      // Çarpışma kontrolü
+      obstacles.forEach((obstacle, index) => {
+        if (checkCollision(player, obstacle)) {
+          gameOver();
+        }
+      });
+
+      // Güçlendirici toplama
+      powerUps.forEach((powerUp, index) => {
+        if (checkCollision(player, powerUp)) {
+          if (powerUp.type === 'nitro') {
+            nitro = Math.min(nitro + 50, 100);
+          } else if (powerUp.type === 'speed') {
+            player.maxSpeed += 20;
+            setTimeout(() => player.maxSpeed -= 20, 5000);
+          }
+          powerUps.splice(index, 1);
+        }
+      });
+
+      // Yeni engeller ve güçlendiriciler oluştur
+      createObstacles();
+      createPowerUps();
+
+      // Nitro yenileme
+      if (!nitroActive && nitro < 100) {
+        nitro += 1;
+      }
+
+      // Bitiş kontrolü
+      if (distance >= 2000) {
+        finishRace();
+      }
+    }
+
+    // Çizim
+    function draw() {
+      // Arka planı temizle
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Yol çizgileri
+      ctx.fillStyle = '#ffffff';
+      roadLines.forEach(line => {
+        ctx.fillRect(line.x, line.y, line.width, line.height);
+      });
+
+      // Yol kenarları
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(0, 0, 150, canvas.height);
+      ctx.fillRect(canvas.width - 150, 0, 150, canvas.height);
+
+      // Engeller
+      obstacles.forEach(obstacle => {
+        if (obstacle.type === 'barrier') {
+          ctx.fillStyle = '#ff0000';
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        } else {
+          ctx.fillStyle = '#0080ff';
+          ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        }
+      });
+
+      // Güçlendiriciler
+      powerUps.forEach(powerUp => {
+        if (powerUp.type === 'nitro') {
+          ctx.fillStyle = '#00ffff';
+          ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('N', powerUp.x + 15, powerUp.y + 25);
+        } else {
+          ctx.fillStyle = '#ffff00';
+          ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+          ctx.fillStyle = '#000000';
+          ctx.fillText('S', powerUp.x + 15, powerUp.y + 25);
+        }
+      });
+
+      // Parçacıklar
+      particles.forEach(particle => {
+        ctx.globalAlpha = particle.life;
+        ctx.fillStyle = particle.color;
+        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+      });
+      ctx.globalAlpha = 1;
+
+      // Oyuncu süper araba
+      ctx.fillStyle = '#00ffff';
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      // Araba detayları
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(player.x + 15, player.y + 20, 50, 30);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 20, player.y + 25, 40, 20);
+
+      // Tekerlekler
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(player.x + 10, player.y + 10, 15, 20);
+      ctx.fillRect(player.x + player.width - 25, player.y + 10, 15, 20);
+      ctx.fillRect(player.x + 10, player.y + player.height - 30, 15, 20);
+      ctx.fillRect(player.x + player.width - 25, player.y + player.height - 30, 15, 20);
+
+      // Nitro bar güncelle
+      document.getElementById('nitroFill').style.width = (nitro / 100) * 200 + 'px';
+    }
+
+    // Oyun döngüsü
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // İstatistikleri güncelle
+    function updateStats() {
+      document.getElementById('speed').textContent = Math.floor(player.speed);
+      document.getElementById('distance').textContent = Math.floor(distance);
+      document.getElementById('time').textContent = Math.floor(time);
+      document.getElementById('nitro').textContent = Math.floor(nitro);
+    }
+
+    // Oyun bitişi
+    function gameOver() {
+      gameRunning = false;
+      document.getElementById('finalTime').textContent = Math.floor(time);
+      document.getElementById('finalDistance').textContent = Math.floor(distance);
+      document.getElementById('maxSpeed').textContent = Math.floor(maxSpeed);
+      document.getElementById('gameOver').style.display = 'block';
+    }
+
+    // Yarış bitişi
+    function finishRace() {
+      gameRunning = false;
+      document.getElementById('finishLine').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('finishLine').style.display = 'none';
+        document.getElementById('finalTime').textContent = Math.floor(time);
+        document.getElementById('finalDistance').textContent = Math.floor(distance);
+        document.getElementById('maxSpeed').textContent = Math.floor(maxSpeed);
+        document.getElementById('gameOver').style.display = 'block';
+      }, 2000);
+    }
+
+    // Oyunu yeniden başlat
+    function restartGame() {
+      speed = 0;
+      distance = 0;
+      time = 0;
+      nitro = 100;
+      nitroActive = false;
+      maxSpeed = 0;
+      driftMode = false;
+      player.x = canvas.width / 2;
+      player.y = canvas.height - 100;
+      player.speed = 0;
+      player.maxSpeed = 300;
+      obstacles = [];
+      powerUps = [];
+      particles = [];
+      createRoadLines();
+      document.getElementById('gameOver').style.display = 'none';
+      document.getElementById('finishLine').style.display = 'none';
+      startCountdown();
+    }
+
+    // Geri sayım
+    function startCountdown() {
+      const countdown = document.getElementById('countdown');
+      countdown.style.display = 'block';
+      
+      let count = 3;
+      const countInterval = setInterval(() => {
+        countdown.textContent = count;
+        if (count <= 0) {
+          clearInterval(countInterval);
+          countdown.style.display = 'none';
+          gameRunning = true;
+          gameStarted = true;
+        }
+        count--;
+      }, 1000);
+    }
+
+    // Ana sayfaya dön
+    function goBack() {
+      window.location.href = '../index.html';
+    }
+
+    // Oyunu başlat
+    createRoadLines();
+    startCountdown();
+    gameLoop();
+
+    // İstatistikleri güncelle
+    setInterval(updateStats, 100);
+  </script>
+</body>
+</html>
